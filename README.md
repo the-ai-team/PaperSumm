@@ -7,6 +7,6 @@
 
 `{app}/{#}/{name}`
 
-{app} - client/server
-{#} - issue number
-{name} - branch name
+{app} - client/server  
+{#} - issue number  
+{name} - branch name  
