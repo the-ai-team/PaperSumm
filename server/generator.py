@@ -1,13 +1,14 @@
 from embeddings import openai
+from embeddings import Embeddings
 import pandas as pd
 from openai.embeddings_utils import distances_from_embeddings
 
 
-def create_context(
+def match_context(
     keywords, df, max_len=1800
 ):
     """
-    Create a context for a keyword by finding the most similar context from the dataframe
+    match context for a keyword by finding the most similar context from the dataframe
     """
 
     k_embeddings = openai.Embedding.create(input=keywords, engine='text-embedding-ada-002')['data'][0]['embedding'] # Get the embeddings for the keyword
@@ -38,7 +39,7 @@ def generate_content(
     """
     Generate content based on the most similar context from the dataframe texts
     """
-    context = create_context(
+    context = match_context(
         keyword,
         df,
         max_len=max_len
@@ -51,11 +52,11 @@ def generate_content(
         response = openai.Completion.create(  # Create a completions using the keyword and context
             prompt=f"""
                     generate a structured document for the following context that extracts the information related on {keyword}.\n Use maximum of 5 subtopics\n.
-                    use readable equations and fomulas\n\n
+                    use readable notation\n\n
                     context : {context}\n\n
                     use this format\n
                     ## Subtopic ##\n
-                    <Summerized paragraph of the subtopic>\n\n
+                    <Generated paragraph of the subtopic>\n\n
                     structured document in passive voice:
                     """,
             temperature=0,
@@ -81,7 +82,33 @@ def content_dict(txt):
     topics = sections[1::2]
     content = sections[2::2]
 
-    df = pd.DataFrame({'Title': topics, 'Content': content}) # store the topics and content in a pandas dataframe
+    dict = [{'Title': topics[i], 'Content': content[i]} for i in range(len(topics))] # Create a list of dictionaries using a list comprehension
 
-    return df
+    return dict
 
+def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.12):
+    """
+    match diagrams for each generated section
+    """
+    for section in generated_content_dict:
+        content_embeddings = openai.Embedding.create(input=section['Content'], engine='text-embedding-ada-002')['data'][0]['embedding'] #Get Embeddings
+        diagrams_df['Distances'] = distances_from_embeddings(content_embeddings, diagrams_df['Embeddings'].values, distance_metric='cosine')  # Get the distances from the embeddings
+
+        diagrams_df = diagrams_df.sort_values('Distances', ascending=True) # sort ascending as distances
+        
+        if diagrams_df['Distances'][0] < threshold:
+            section['Diagrams'] = {'Type':diagrams_df['Type'][0],'Figure':diagrams_df['Figure'][0],'Description':diagrams_df['Text'][0]}
+
+    return generated_content_dict
+
+
+def Generate(content_df,diagrams_df,keyword):
+    """
+    Main function for generating
+    """
+    generated_content = generate_content(content_df,keyword=keyword) # generate content
+    generated_content_dict = content_dict(generated_content) # create dictionary
+
+    generated_content_dict = match_diagrams(diagrams_df,generated_content_dict) # match diagrams
+
+    return generated_content_dict
