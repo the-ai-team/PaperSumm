@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
+import tiktoken
+
+# Load the cl100k_base tokenizer which is designed to work with the ada-002 model
+tokenizer = tiktoken.encoding_for_model("text-davinci-003")
 
 
 def get_page(url):
@@ -17,6 +21,29 @@ def clean_text(raw_text):
     clean_text = re.sub(r'\[\d+(?:,\s*\d+)*\]', '', raw_text).replace('\n',' ') #remove citations and new line characters
     return clean_text
 
+def create_chunks(context,max_tokens=768):
+    """
+    create chunks of cintext which is suitable to pass to the model
+    """
+    sentences = context.split('. ') # Split the text into sentences
+    n_tokens = [len(tokenizer.encode(" " + sentence)) for sentence in sentences]  # Get the number of tokens for each sentence
+
+    chunks = []
+    tokens_so_far = 0
+    chunk = ""
+
+    for sentence, token in zip(sentences, n_tokens): # Loop through the sentences and tokens joined together in a tuple
+            
+            if tokens_so_far + token < max_tokens:
+                chunk += sentence + ". "
+                tokens_so_far += token
+            else:
+                chunks.append(chunk)
+                chunk = sentence
+                tokens_so_far = token
+
+    return chunks
+
 def extract_context(soup):
     """
     extract and join text wrapped with p tags
@@ -28,7 +55,7 @@ def extract_context(soup):
     context_cleaned = clean_text(context) #clean context
 
     df = pd.DataFrame()
-    df['Text'] = context_cleaned.split('. ')
+    df['Text'] = create_chunks(context_cleaned)
     
     return df
 
