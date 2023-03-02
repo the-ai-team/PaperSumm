@@ -1,27 +1,21 @@
-import tensorflow as tf
-from transformers import AutoTokenizer, TFBertModel
+import openai
+from dotenv import load_dotenv
+import os
 import tiktoken
 
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased") # load tokenizer
-model = TFBertModel.from_pretrained("bert-base-uncased") # load model
+load_dotenv() # Load the environment variables from the .env file
 
-# Load the cl100k_base tokenizer which is designed to work with the davinci-003 model
-tokenizer_davinci = tiktoken.encoding_for_model("text-davinci-003")
+openai_api_key = os.getenv('OPEN_AI') # Get the value of the API key
+openai.api_key=openai_api_key
 
-def get_embeddings(text):
-    """
-    Get embeddings of a text sequence
-    """
-    n_tokens = len(tokenizer_davinci.encode(text)) #no of teokens in the sequence
+tokenizer = tiktoken.encoding_for_model("text-davinci-003") # Load the cl100k_base tokenizer which is designed to work with the davinci-003 model
 
-    tokens = tokenizer.encode(text, add_special_tokens=True, return_tensors='tf') # Tokenize the input text
-    outputs = model(tokens) # Pass the tokens through the BERT model
-    cls_embedding = outputs.last_hidden_state[:, 0, :] # Extract the last hidden state of the BERT model for the [CLS] token
-    return n_tokens, cls_embedding.numpy() # Convert the embedding to a NumPy array and return it
 
 def Embeddings(df,text_column = 'Text'):
     """
     Main function to get embeddings
     """
-    df['N_tokens'], df['Embeddings'] = zip(*df[text_column].apply(get_embeddings) )# Apply the function to the text column to create a new embeddings column
+    df['Embeddings'] = df[text_column].apply(lambda x: openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding']) #get embeddings
+    df['N_tokens'] = df[text_column].apply(lambda x: len(tokenizer.encode(x))) # Tokenize the text and save the number of tokens to a new column
+
     return df
