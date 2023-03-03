@@ -8,7 +8,8 @@ load_dotenv() # Load the environment variables from the .env file
 openai_api_key = os.getenv('OPEN_AI') # Get the value of the API key
 openai.api_key=openai_api_key
 
-tokenizer = tiktoken.encoding_for_model("text-davinci-003") # Load the cl100k_base tokenizer which is designed to work with the davinci-003 model
+
+tokenizer = tiktoken.get_encoding("cl100k_base") # Load the cl100k_base tokenizer which is designed to work with the davinci-003 model
 
 
 def Embeddings(df,text_column = 'Text'):
