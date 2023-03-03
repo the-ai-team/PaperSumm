@@ -31,7 +31,7 @@ def match_context(
 def generate_content(
     df,
     keyword,
-    model="text-davinci-003",
+    model="gpt-3.5-turbo",
     max_len=1800,
     debug=False,
     stop_sequence=None
@@ -49,17 +49,20 @@ def generate_content(
         print("\n\n")
 
     try: 
-        response = openai.Completion.create(  # Create a completions using the keyword and context
-            prompt=f"""
-                    generate a structured document for the following context that extracts the information related on {keyword}.\n Use maximum of 5 subtopics\n.
+        response = openai.ChatCompletion.create(  # Create a completions using the keyword and context
+            messages = [{
+                "role":"user",
+                "content": f"""
+                    generate a structured document under generated subtopics for the following context that extracts the information related on {keyword}.\n Use maximum of 5 subtopics\n.
                     use readable notation\n\n
                     context : {context}\n\n
                     use this format\n
-                    ## Subtopic ##\n
+                    ## Generated Subtopic ##\n
                     <Generated paragraph of the subtopic>\n\n
                     structured document in passive voice:
-                    """,
-            temperature=0,
+                    """
+            }],
+            temperature=0.5,
             max_tokens = 2048,
             top_p=1,
             frequency_penalty=0,
@@ -67,7 +70,7 @@ def generate_content(
             stop=stop_sequence,
             model=model,
         )
-        return response["choices"][0]["text"].strip()
+        return response["choices"][0]["message"]["content"].strip()
     except Exception as e:
         print(e)
         return ""
