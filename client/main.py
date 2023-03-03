@@ -1,8 +1,12 @@
+import os
+import sys
+
 import streamlit as st
 st.set_page_config(page_title="Paper.sum", page_icon=":page_facing_up:")
 st.title("Paper.sum")
 
-from main import Generate_summary
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from server.main import Generate_summary
 from components import Generate_Components
 from sampledata import sample
 
