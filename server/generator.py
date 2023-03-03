@@ -18,7 +18,7 @@ def get_related_info(keyword,context):
                     """
             }],
             temperature=0.5,
-            max_tokens = 512,
+            max_tokens = 1024,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
@@ -48,7 +48,7 @@ def generate_content(
                  """
             }],
             temperature=0.5,
-            max_tokens = 1024,
+            max_tokens = 2048,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
