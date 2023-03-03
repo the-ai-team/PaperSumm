@@ -72,7 +72,7 @@ def content_dict(txt):
 
     return dict
 
-def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.13):
+def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.15):
     """
     match diagrams for each generated section
     """
