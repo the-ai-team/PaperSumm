@@ -29,7 +29,7 @@ def clean_text(raw_text):
     clean_text = re.sub(r'\[\d+(?:,\s*\d+)*\]', '', raw_text).replace('\n',' ') #remove citations and new line characters
     return clean_text
 
-def create_chunks(context,max_tokens=768):
+def create_chunks(context,max_tokens=2048):
     """
     create chunks of cintext which is suitable to pass to the model
     """
