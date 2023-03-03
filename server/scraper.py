@@ -7,6 +7,14 @@ import tiktoken
 # Load the cl100k_base tokenizer which is designed to work with the ada-002 model
 tokenizer = tiktoken.encoding_for_model("text-davinci-003")
 
+def link_parser(url):
+    """
+    Get the html page from the arxiv link
+    """
+    id = url.split("/")[-1]
+    HTML_url = f"https://ar5iv.labs.arxiv.org/html/{id}"
+    return HTML_url
+
 
 def get_page(url):
     """
@@ -94,7 +102,8 @@ def Extract(url):
     """
     Main function to extract content
     """
-    soup = get_page(url)
+    HTML_url = link_parser(url)
+    soup = get_page(HTML_url)
 
     content_df = extract_context(soup)
     diagrams_df = extract_diagrams(soup)
