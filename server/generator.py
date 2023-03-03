@@ -1,6 +1,4 @@
 from server.embeddings import openai
-from server.embeddings import Embeddings
-import pandas as pd
 import concurrent.futures
 
 from openai.embeddings_utils import distances_from_embeddings
@@ -20,7 +18,7 @@ def get_related_info(keyword,context):
                     """
             }],
             temperature=0.5,
-            max_tokens = 1024,
+            max_tokens = 512,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
@@ -40,15 +38,17 @@ def generate_content(
     response = openai.ChatCompletion.create(  # Create a completions using the keyword and context
             messages = [{
                 "role":"user",
-                "content": f"""Summarize the following context which is from a research paper under suitable subtopics exclusively related to {keyword}.\n\n
+                "content": f"""
+                Organize the following points related to {keyword} of a research by dividing into suitable subtopics. Generate a summerized paragraph for each subtopic\n\n
                 use this format,\n
                 ## generated subtopic ##\n
                 <Summarized paragraph under the subtopic>\n\n
-                context: {context}    
+                points: {context} 
+                organized document:   
                  """
             }],
             temperature=0.5,
-            max_tokens = 2048,
+            max_tokens = 1024,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
@@ -72,7 +72,7 @@ def content_dict(txt):
 
     return dict
 
-def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.15):
+def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.13):
     """
     match diagrams for each generated section
     """
@@ -84,6 +84,7 @@ def match_diagrams(diagrams_df,generated_content_dict,threshold = 0.15):
         
         if diagrams_df['Distances'][0] < threshold:
             section['Diagrams'] = {'Type':diagrams_df['Type'][0],'Figure':diagrams_df['Figure'][0],'Description':diagrams_df['Text'][0]}
+            # diagrams_df = diagrams_df.drop(index = 0)
 
     return generated_content_dict
 

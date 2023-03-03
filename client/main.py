@@ -14,15 +14,16 @@ from css_importer import local_css
 local_css("style.css")
 
 link = st.text_input("Input URL to Research Paper")
-selectable_tags = ['Experiments', 'Results', 'Beginner']
-default_tags = ['Experiments']
+selectable_tags = ['Experiments and Results', 'Proposed solution', 'Building blocks and Methalogy']
+default_tags = ['Experiments and Results']
 selected_tags = st.multiselect(
     'Select tags',
     selectable_tags, default_tags)
 
 if link:
     if st.button('Summarize'):
-        summary = Generate_summary(link, selected_tags)
+        with st.spinner("Reading..."):
+            summary = Generate_summary(link, selected_tags)
         Generate_Components(summary)
     else:
         st.markdown('### Click on summarize to generate')
