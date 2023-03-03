@@ -1,20 +1,28 @@
-import streamlit as st
 import os
+import sys
 
-st.set_page_config(page_title="SummarizeIt", page_icon=":page_facing_up:")
-st.title("Summarize it")
+import streamlit as st
+st.set_page_config(page_title="Paper.sum", page_icon=":page_facing_up:")
+st.title("Paper.sum")
 
-# Adding styles
-script_dir = os.path.dirname(__file__)
-def local_css(file_name):
-    abs_path_dir = os.path.join(script_dir, file_name)
-    with open(abs_path_dir) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from server.main import Generate_summary
+from components import Generate_Components
+from sampledata import sample
+
+from css_importer import local_css
 local_css("style.css")
 
-st.text_input("Input URL to Research Paper")
-selectable_tags = ['Beginner', 'Sample Tag', 'Tag2', 'Tag3']
-default_tags = ['Beginner']
-tags = st.multiselect(
+link = st.text_input("Input URL to Research Paper")
+selectable_tags = ['Experiments', 'Results', 'Beginner']
+default_tags = ['Experiments']
+selected_tags = st.multiselect(
     'Select tags',
     selectable_tags, default_tags)
+
+if link:
+    if st.button('Summarize'):
+        summary = Generate_summary(link, selected_tags)
+        Generate_Components(summary)
+    else:
+        st.markdown('### Click on summarize to generate')

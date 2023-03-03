@@ -1,6 +1,6 @@
-from scraper import *
+from server.scraper import *
 from embeddings import *
-from generator import *
+from server.generator import *
 
 def Generate_summary(url,keyword):
     """
