@@ -1,5 +1,5 @@
-from embeddings import openai
-from embeddings import Embeddings
+from server.embeddings import openai
+from server.embeddings import Embeddings
 import pandas as pd
 import concurrent.futures
 

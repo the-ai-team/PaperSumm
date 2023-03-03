@@ -5,3 +5,5 @@ python-dotenv==1.0.0
 requests==2.28.2
 streamlit==1.18.1
 tiktoken==0.2.0
+randomcolor~=0.4.4.6
+setuptools~=63.2.0
