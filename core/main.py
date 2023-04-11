@@ -1,6 +1,6 @@
-from server.scraper import *
-from server.embeddings import *
-from server.generator import *
+from core.scraper import *
+from core.embeddings import *
+from core.generator import *
 
 def Generate_summary(url,keyword):
     """

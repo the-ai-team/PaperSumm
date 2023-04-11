@@ -1,4 +1,4 @@
-from server.embeddings import openai
+from core.embeddings import openai
 import concurrent.futures
 
 from openai.embeddings_utils import distances_from_embeddings
