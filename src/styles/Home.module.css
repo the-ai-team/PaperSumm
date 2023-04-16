@@ -1,0 +1,101 @@
+.main {
+    --padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding);
+    min-height: 100vh;
+    background-color: #111;
+}
+
+.animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.info {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+}
+
+.container {
+    background-color: rgb(40 40 40 / 45%);
+    width: 100%;
+    height: calc(100vh - var(--padding) * 2);
+    border-radius: 40px;
+    padding: 8rem 10rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(93 93 93 / 20%);
+    z-index: 10;
+    display: flex;
+    gap: 2em;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inputs {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    gap: 1em;
+}
+
+.input_box {
+    flex: 6;
+}
+
+.button {
+    flex: 1;
+}
+
+.output {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.filler {
+
+    width: 20px;
+    aspect-ratio: 1/1;
+    position: absolute;
+    margin: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 12;
+    border-radius: 50%;
+    animation: expand .5s 2s ease-in forwards;
+}
+
+@keyframes expand {
+    0% {
+        background: #fff;
+        width: 20px;
+    }
+    100% {
+        background: #f1f3f5;
+        width: 200%;
+        z-index: 20;
+    }
+}
