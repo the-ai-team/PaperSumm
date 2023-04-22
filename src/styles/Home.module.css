@@ -27,7 +27,7 @@
 }
 
 .container {
-    background-color: rgb(40 40 40 / 45%);
+    background-color: rgb(80 80 80 / 45%);
     width: 100%;
     height: calc(100vh - var(--padding) * 2);
     border-radius: 40px;
@@ -75,7 +75,6 @@
 }
 
 .filler {
-
     width: 20px;
     aspect-ratio: 1/1;
     position: absolute;
@@ -86,15 +85,17 @@
     z-index: 12;
     border-radius: 50%;
     animation: expand .5s 2s ease-in forwards;
+    /*width: 200%;*/
+    background: #323232;
 }
 
 @keyframes expand {
     0% {
-        background: #fff;
+        /*background: #fff;*/
         width: 20px;
     }
     100% {
-        background: #f1f3f5;
+        /*background: #484848;*/
         width: 200%;
         z-index: 20;
     }

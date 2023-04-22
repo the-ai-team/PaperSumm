@@ -1,14 +1,18 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import {ActionIcon, Button, Input} from "@mantine/core";
+import {ActionIcon, Button, Input, MultiSelect} from "@mantine/core";
 import {Info, MagnifyingGlass} from "@phosphor-icons/react";
 import {Loading} from "@/components/Loading";
-import {K2D} from 'next/font/google'
+import {Roboto_Mono} from 'next/font/google'
 import {AnimationBackground} from "@/components/AnimationBackground";
+import "../utils/fetchAPI"
 
-const font = K2D({subsets: ['latin'], weight: ["400", "700"]})
+const font = Roboto_Mono({subsets: ['latin'], weight: ["400", "700"]})
 
 export default function Home() {
+    const tags = [
+        { value: 'experiments and results', label: 'Experiments and Results' },
+    ];
 
     return (
         <>
@@ -29,20 +33,29 @@ export default function Home() {
                         </ActionIcon>
                     </div>
                     <div className={styles.inputs}>
-                        <Input.Wrapper description="Input arxiv URL to Research Paper"
+                        <Input.Wrapper label="Input arxiv URL to Research Paper"
                                        className={styles.input_box}
-                                       styles={{description: {fontFamily: font.style.fontFamily}}}>
+                                       styles={{label: {fontFamily: font.style.fontFamily}}}>
                             <Input
                                 icon={<MagnifyingGlass size={24} color="#1994fb" weight="light"/>}
-                                variant="filled"
                                 placeholder="https://arxiv.org/abs/1512.03385"
                                 radius="xl"
                                 size="md"
                                 styles={{input: {fontFamily: font.style.fontFamily}}}
                             />
                         </Input.Wrapper>
+                        <MultiSelect
+                            data={tags}
+                            label="Select tags"
+                            searchable
+                            clearable
+                            radius="xl"
+                            size="md"
+                            nothingFound="No tags found"
+                            styles={{label: {fontFamily: font.style.fontFamily}}}
+                        />
                         <Button radius="xl" size="md" style={{fontFamily: font.style.fontFamily}}>
-                            Upload
+                            Summarize
                         </Button>
                     </div>
                     <div className={styles.output}>

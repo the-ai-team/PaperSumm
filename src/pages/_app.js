@@ -8,7 +8,7 @@ export default function App({Component, pageProps}) {
             withGlobalStyles
             withNormalizeCSS
             theme={{
-                colorScheme: 'light',
+                colorScheme: 'dark',
             }}
         >
             <main>
