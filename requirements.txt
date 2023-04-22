@@ -6,3 +6,7 @@ pydantic==1.10.7
 python-dotenv==1.0.0
 requests==2.28.2
 tiktoken==0.3.3
+matplotlib==3.7.1
+plotly==5.14.1
+scipy==1.10.1
+scikit-learn==1.2.2
