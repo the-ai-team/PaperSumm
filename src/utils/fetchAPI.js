@@ -15,6 +15,7 @@ const fetchAPI = async (url, data) => {
     }
 }
 
+// async function fetchAPIWith(url, data) {
 (async () => {
     const summary = await fetchAPI('http://localhost:8000/generate', {
         url: 'https://arxiv.org/abs/1512.03385',
@@ -22,18 +23,3 @@ const fetchAPI = async (url, data) => {
     })
 console.log(summary);
 })()
-// get request to api
-// (
-//     async () => {
-//         console.log('hello')
-//         const response = await fetch('http://localhost:8000/test', {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//         });
-//         const summary = await response.json();
-//         console.log(summary);
-//     }
-// )()
-

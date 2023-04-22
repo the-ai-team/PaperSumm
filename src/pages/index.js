@@ -6,12 +6,13 @@ import {Loading} from "@/components/Loading";
 import {Roboto_Mono} from 'next/font/google'
 import {AnimationBackground} from "@/components/AnimationBackground";
 import "../utils/fetchAPI"
+import {Section} from "@/components/Section";
 
-const font = Roboto_Mono({subsets: ['latin'], weight: ["400", "700"]})
+const font = Roboto_Mono({subsets: ['latin'], weight: "variable"})
 
 export default function Home() {
     const tags = [
-        { value: 'experiments and results', label: 'Experiments and Results' },
+        {value: 'experiments and results', label: 'Experiments and Results'},
     ];
 
     return (
@@ -62,7 +63,34 @@ export default function Home() {
                         <Loading/>
                         <div className={styles.content}>
                             <div className={styles.filler}>
-
+                            </div>
+                            <div className={styles.summary}>
+                                <h2 className={styles.summary_caption}>Summary</h2>
+                                <Section title="Experiments and Results">
+                                    Nam ipsum ante, imperdiet et enim nec, fermentum ultrices sem. Aenean cursus nec
+                                    turpis quis pharetra. Mauris hendrerit metus id scelerisque tincidunt. Suspendisse
+                                    lacus ante, interdum et tincidunt non, faucibus in ex. Curabitur vel dolor
+                                    facilisis, ultricies augue et, efficitur nisi. Quisque posuere consequat elementum.
+                                    Integer sit amet rhoncus orci. Mauris sodales dolor dolor, maximus sagittis nulla
+                                    congue sit amet. Quisque sit amet euismod nibh. Sed eleifend ligula pulvinar massa
+                                    laoreet semper. Donec luctus mauris non faucibus volutpat. Phasellus vel porttitor
+                                    eros, vel cursus felis. Cras faucibus egestas tortor non facilisis. Nullam ultricies
+                                    vel nisl sit amet gravida.
+                                </Section>
+                                <Section title="Outcomes">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pulvinar luctus quam,
+                                    ac dignissim est consequat in. Phasellus pharetra volutpat ornare. Pellentesque
+                                    interdum, purus nec lacinia tempor, eros felis volutpat lectus, vitae lobortis dui
+                                    urna eu risus. Morbi finibus ante eget lacus luctus consectetur. Phasellus eu congue
+                                    mi. Sed neque elit, lobortis quis tellus eu, pharetra sodales neque. Suspendisse
+                                    pellentesque ipsum id nibh porttitor, nec consectetur orci sollicitudin. Nunc non
+                                    nibh quis ante lacinia venenatis. Phasellus sed porta justo, quis volutpat felis.
+                                    Quisque cursus erat lacus, iaculis cursus tortor consequat ac. Curabitur aliquet
+                                    sapien in erat fringilla, quis egestas tellus vehicula. Nam egestas accumsan lacus
+                                    ut mattis. Donec lobortis libero eu erat pellentesque, ac volutpat leo commodo.
+                                    Morbi nec est laoreet, commodo tortor ut, venenatis erat. Nam eget velit purus. Sed
+                                    nec convallis lectus, a porta lectus.
+                                </Section>
                             </div>
                         </div>
                     </div>

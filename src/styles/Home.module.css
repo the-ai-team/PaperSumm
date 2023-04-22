@@ -7,6 +7,7 @@
     align-items: center;
     padding: var(--padding);
     min-height: 100vh;
+    max-width: 100vw;
     background-color: #111;
 }
 
@@ -29,24 +30,21 @@
 .container {
     background-color: rgb(80 80 80 / 45%);
     width: 100%;
+    max-width: 1300px;
+    max-height: 2000px;
+    min-height: 600px;
     height: calc(100vh - var(--padding) * 2);
     border-radius: 40px;
-    padding: 8rem 10rem;
+    padding: 6rem;
     backdrop-filter: blur(10px);
     border: 1px solid rgb(93 93 93 / 20%);
     z-index: 10;
     display: flex;
     gap: 2em;
+    margin: auto;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-}
-
-.inputs {
-    display: flex;
-    width: 100%;
-    align-items: flex-end;
-    gap: 1em;
 }
 
 .input_box {
@@ -85,7 +83,6 @@
     z-index: 12;
     border-radius: 50%;
     animation: expand .5s 2s ease-in forwards;
-    /*width: 200%;*/
     background: #323232;
 }
 
@@ -98,5 +95,78 @@
         /*background: #484848;*/
         width: 200%;
         z-index: 20;
+    }
+}
+
+.summary{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    padding: 2em;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    overflow-y: scroll;
+    opacity: 0;
+    animation: load .5s 2.5s ease-in forwards;
+}
+
+@keyframes load {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.summary_caption{
+    font-size: 3rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+}
+
+.inputs {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    gap: 1em;
+}
+
+@media screen and (max-width: 768px) {
+    .main{
+        --padding: 0;
+    }
+
+    .container {
+        padding: 1.2rem;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .inputs {
+        margin-top: 40px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .info {
+        top: 1em;
+        right: 1em;
+    }
+
+    .summary{
+        padding: 1em;
+        gap: 1em;
+    }
+
+    .summary_caption{
+        font-size: 2rem;
     }
 }

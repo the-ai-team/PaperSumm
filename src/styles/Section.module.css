@@ -1,0 +1,35 @@
+.section{
+    padding: 2rem;
+    border-radius: 0.5rem;
+    color: #ffffff;
+    box-shadow: #00000021 2px 2px 12px 4px;
+    border: 1px solid #ffffff0d;
+}
+
+.section h2{
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    padding: .2em .4em;
+}
+
+.section p{
+    font-weight: 300;
+    color: #ffffff;
+    padding: 1.2em;
+    line-height: 1.8;
+    border-radius: 0.5rem;
+    background: #0000001c;
+}
+
+@media screen and (max-width: 768px) {
+    .section{
+        padding: 1rem;
+    }
+    .section h2{
+        font-size: 1.5rem;
+    }
+    .section p{
+        padding: 1rem;
+    }
+}
