@@ -1,19 +1,113 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import {ActionIcon, Button, Input, MultiSelect} from "@mantine/core";
-import {Info, MagnifyingGlass} from "@phosphor-icons/react";
+import {Button, createStyles, Input, MultiSelect} from "@mantine/core";
+import {MagnifyingGlass} from "@phosphor-icons/react";
 import {Loading} from "@/components/Loading";
-import {Roboto_Mono} from 'next/font/google'
-import {AnimationBackground} from "@/components/AnimationBackground";
-import "../utils/fetchAPI"
+import {Inter, Roboto_Mono} from 'next/font/google'
 import {Section} from "@/components/Section";
+import {useEffect, useState} from "react";
+import logo from '@/assets/logo.png'
+import Image from "next/image";
 
 const font = Roboto_Mono({subsets: ['latin'], weight: "variable"})
+const font2 = Inter({subsets: ['latin'], weight: "variable"})
+
+const useStyles = createStyles((theme) => ({
+    label: {
+        fontFamily: font.style.fontFamily,
+        marginBottom: '0.5em',
+    },
+    input: {
+        fontFamily: font.style.fontFamily,
+    },
+    dropdown: {
+        borderRadius: "1rem",
+        padding: "2rem",
+    },
+    item: {
+        borderRadius: "1rem",
+        fontSize: ".875rem",
+        padding: "0.5rem 1rem",
+    }
+}));
 
 export default function Home() {
+    const {classes} = useStyles();
+
+    const SummaryStateEnum = {
+        hidden: 'hidden',
+        loading: 'loading',
+        success: 'success',
+        error: 'error',
+    }
+    const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
+    // const [linkPopover, toggleLinkPopover] = useState(false);
+    // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
+    const [link, setLink] = useState('');
+    const [tag, setTag] = useState(['']);
+    const [inputValid, setInputValid] = useState(false);
+    const [loadingText, setLoadingText] = useState('Loading...');
+
+    useEffect(() => {
+        if (summaryState === SummaryStateEnum.hidden) {
+            // document.documentElement.style.setProperty("--window-padding", "1rem");
+            // document.documentElement.style.setProperty("--container-border-radius", "40px");
+        }
+    }, [summaryState])
+
+    useEffect(() => {
+        // TODO: only check after user submit
+        const regex = new RegExp('^(https?://)?(www.)?(arxiv.org/abs/)[a-zA-Z0-9]{4,9}.[a-zA-Z0-9]{4,9}$');
+
+        if (regex.test(link) && tag.length > 0) {
+            setInputValid(true);
+        } else {
+            //TODO: change to false
+            setInputValid(true);
+        }
+
+    }, [link, tag])
+
+    useEffect(() => {
+        console.log(window.innerWidth);
+        const handleResize = () => {
+
+            if (window.innerWidth > 1800) {
+                console.log('large');
+                document.documentElement.style.setProperty("--window-padding", "2rem");
+                document.documentElement.style.setProperty("--container-border-radius", "40px");
+            }
+        }
+        handleResize();
+
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [])
+
+
     const tags = [
         {value: 'experiments and results', label: 'Experiments and Results'},
     ];
+
+    const summarize = async () => {
+        setSummaryState(SummaryStateEnum.loading);
+        // if (summaryState === SummaryStateEnum.loading) {
+        //     setSummaryState(SummaryStateEnum.hidden)
+        // }
+        const summary = await fetchAPI({
+            url: link,
+            keyword: tag,
+        })
+        // console.log(summary);
+        // setSummaryState(SummaryStateEnum.success);
+    }
+
+    // const summary = fetchAPI('http://localhost:8000/generate', {
+    //     url: 'https://arxiv.org/abs/1512.03385',
+    //     keyword: 'Experiments and results',
+    // })
 
     return (
         <>
@@ -23,48 +117,67 @@ export default function Home() {
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
-            <main className={styles.main} style={{fontFamily: font.style.fontFamily}}>
-                <div className={styles.animation}>
-                    <AnimationBackground/>
-                </div>
-                <div className={styles.container}>
-                    <div className={styles.info}>
-                        <ActionIcon color="blue" size="xl" radius="xl" variant="filled">
-                            <Info size={24} color="#fff" weight="light"/>
-                        </ActionIcon>
+            <main className={styles.main} data-summary-state={summaryState} style={{fontFamily: font.style.fontFamily}}>
+                {/*<div className={styles.animation}>*/}
+                {/*    <AnimationBackground/>*/}
+                {/*</div>*/}
+                <div className={styles.container} data-summary-state={summaryState}>
+                    {/*<div className={styles.info}>*/}
+                    {/*    <ActionIcon color="blue" size="xl" radius="xl" variant="filled">*/}
+                    {/*        <Info size={24} color="#fff" weight="light"/>*/}
+                    {/*    </ActionIcon>*/}
+                    {/*</div>*/}
+                    <div className={styles.logo_content} data-summary-state={summaryState}>
+                        <Image src={logo} data-summary-state={summaryState} placeholder="blur" alt="logo"
+                               className={styles.logo}></Image>
+                        <h2 className={styles.title} data-summary-state={summaryState}
+                            style={{fontFamily: font2.style.fontFamily}}>
+                            {summaryState === SummaryStateEnum.hidden ?
+                                <>We <span>summ</span>arize <br/> your Archive <span>Paper</span></>
+                                :
+                                <>PaperSumm</>
+                            }
+                        </h2>
                     </div>
-                    <div className={styles.inputs}>
+                    <div className={styles.inputs} data-summary-state={summaryState}>
                         <Input.Wrapper label="Input arxiv URL to Research Paper"
                                        className={styles.input_box}
-                                       styles={{label: {fontFamily: font.style.fontFamily}}}>
+                                       classNames={{label: classes.label}}
+                                       size="md">
+
                             <Input
                                 icon={<MagnifyingGlass size={24} color="#1994fb" weight="light"/>}
                                 placeholder="https://arxiv.org/abs/1512.03385"
                                 radius="xl"
                                 size="md"
-                                styles={{input: {fontFamily: font.style.fontFamily}}}
+                                value={link}
+                                onChange={(event) => setLink(event.currentTarget.value)}
+                                classNames={{input: classes.input}}
                             />
                         </Input.Wrapper>
                         <MultiSelect
                             data={tags}
-                            label="Select tags"
+                            label="Select a tag"
                             searchable
                             clearable
                             radius="xl"
                             size="md"
+                            value={tag}
+                            onChange={(value) => setTag(value)}
                             nothingFound="No tags found"
-                            styles={{label: {fontFamily: font.style.fontFamily}}}
+                            classNames={{label: classes.label, dropdown: classes.dropdown, item: classes.item}}
                         />
-                        <Button radius="xl" size="md" style={{fontFamily: font.style.fontFamily}}>
+                        <Button radius="xl" size="md" className={styles.button} onClick={summarize}
+                                style={{fontFamily: font.style.fontFamily}} disabled={!inputValid}>
                             Summarize
                         </Button>
                     </div>
                     <div className={styles.output}>
-                        <Loading/>
-                        <div className={styles.content}>
-                            <div className={styles.filler}>
+                        <Loading show={summaryState === SummaryStateEnum.loading} text={loadingText}/>
+                        <div className={styles.content} data-summary-state={summaryState}>
+                            <div className={styles.filler} data-summary-state={summaryState}>
                             </div>
-                            <div className={styles.summary}>
+                            <div className={styles.summary} data-summary-state={summaryState}>
                                 <h2 className={styles.summary_caption}>Summary</h2>
                                 <Section title="Experiments and Results">
                                     Nam ipsum ante, imperdiet et enim nec, fermentum ultrices sem. Aenean cursus nec
