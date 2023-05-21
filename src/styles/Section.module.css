@@ -1,35 +1,83 @@
-.section{
-    padding: 2rem;
+.section {
+    padding: 1.5rem;
     border-radius: 0.5rem;
     color: #ffffff;
-    box-shadow: #00000021 2px 2px 12px 4px;
+    color: var(--text-color);
+    /*box-shadow: #00000021 2px 2px 12px 4px;*/
+    /*box-shadow: rgba(var(--background-color), 1) 2px 2px 12px 4px;*/
     border: 1px solid #ffffff0d;
+    max-width: 800px;
+    margin: auto;
+    transition: all .5s ease-out;
 }
 
-.section h2{
+.section h2 {
     font-size: 2rem;
     font-weight: 500;
     margin-bottom: 1rem;
     padding: .2em .4em;
+    transition: all .25s ease;
 }
 
-.section p{
-    font-weight: 300;
+.diagrams {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1em;
+    padding-top: 1.2em;
+    margin-top: 2em;
+    background: #0000001c;
+    background: rgba(var(--text-background), 0.4);
+    border-radius: 0.5rem;
+    transition: all .5s ease-out;
+}
+
+.section p {
+    font-weight: 400;
     color: #ffffff;
+    color: var(--text-color);
     padding: 1.2em;
     line-height: 1.8;
-    border-radius: 0.5rem;
     background: #0000001c;
+    background: rgba(var(--text-background), 0.4);
+    border-radius: 0.5rem;
+}
+
+.section img {
+    height: 150px;
+    margin: .25rem;
+    border-radius: 0.5rem;
+    background: white;
 }
 
 @media screen and (max-width: 768px) {
-    .section{
+    .section {
         padding: 1rem;
     }
-    .section h2{
+
+    .section h2 {
         font-size: 1.5rem;
     }
-    .section p{
+
+    .section p {
         padding: 1rem;
+    }
+
+    .diagrams {
+        gap: 0;
+    }
+
+    .section img {
+        height: auto;
+        width: 100%;
+        padding: .5em;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .diagrams p {
+        border-radius: 0;
+        background: none;
     }
 }

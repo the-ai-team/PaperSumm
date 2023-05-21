@@ -1,214 +1,334 @@
-import Head from 'next/head'
-import styles from '@/styles/Home.module.css'
-import {Button, createStyles, Input, MultiSelect} from "@mantine/core";
-import {MagnifyingGlass} from "@phosphor-icons/react";
-import {Loading} from "@/components/Loading";
-import {Inter, Roboto_Mono} from 'next/font/google'
-import {Section} from "@/components/Section";
-import {useEffect, useState} from "react";
-import logo from '@/assets/logo.png'
+import Head from "next/head";
+import styles from "@/styles/Home.module.css";
+import {
+  ActionIcon,
+  Button,
+  createStyles,
+  Input,
+  MultiSelect,
+  useMantineColorScheme,
+} from "@mantine/core";
+import {
+  CaretCircleUp,
+  MagnifyingGlass,
+  Moon,
+  Sun,
+} from "@phosphor-icons/react";
+import { Loading } from "@/components/Loading";
+import { Inter, Roboto_Mono } from "next/font/google";
+import { Section } from "@/components/Section";
+import { useEffect, useState } from "react";
+import logo from "@/assets/logo.png";
 import Image from "next/image";
+import { fetchAPI } from "@/utils/fetchAPI";
 
-const font = Roboto_Mono({subsets: ['latin'], weight: "variable"})
-const font2 = Inter({subsets: ['latin'], weight: "variable"})
+const font = Roboto_Mono({ subsets: ["latin"], weight: "variable" });
+const font2 = Inter({ subsets: ["latin"], weight: "variable" });
 
 const useStyles = createStyles((theme) => ({
-    label: {
-        fontFamily: font.style.fontFamily,
-        marginBottom: '0.5em',
-    },
-    input: {
-        fontFamily: font.style.fontFamily,
-    },
-    dropdown: {
-        borderRadius: "1rem",
-        padding: "2rem",
-    },
-    item: {
-        borderRadius: "1rem",
-        fontSize: ".875rem",
-        padding: "0.5rem 1rem",
-    }
+  label: {
+    fontFamily: font.style.fontFamily,
+    marginBottom: "0.5em",
+  },
+  input: {
+    fontFamily: font.style.fontFamily,
+  },
+  dropdown: {
+    fontFamily: font.style.fontFamily,
+    borderRadius: "1rem",
+    padding: "2rem",
+  },
+  item: {
+    fontFamily: font.style.fontFamily,
+    borderRadius: "1rem",
+    fontSize: ".875rem",
+    padding: "0.5rem 1rem",
+  },
+  defaultValueLabel: {
+    fontFamily: font.style.fontFamily,
+  },
+  nothingFound: {
+    fontFamily: font.style.fontFamily,
+  },
 }));
 
 export default function Home() {
-    const {classes} = useStyles();
+  const { classes } = useStyles();
 
-    const SummaryStateEnum = {
-        hidden: 'hidden',
-        loading: 'loading',
-        success: 'success',
-        error: 'error',
+  const SummaryStateEnum = {
+    hidden: "hidden",
+    loading: "loading",
+    success: "success",
+    error: "error",
+  };
+  const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
+  // const [linkPopover, toggleLinkPopover] = useState(false);
+  // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
+  const [link, setLink] = useState("");
+  //TODO: remove tag
+  const [tag, setTag] = useState([]);
+  const [inputValid, setInputValid] = useState(false);
+  const [isSearchExpanded, toggleSearchExpanded] = useState(true);
+  const [expandableHeightTaken, setExpandableHeightTaken] = useState(false);
+
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
+  function toggleScheme() {
+    toggleColorScheme();
+    document.documentElement.setAttribute(
+      "data-theme",
+      colorScheme === "dark" ? "light" : "dark"
+    );
+    localStorage.setItem(
+      "colorScheme",
+      colorScheme === "dark" ? "light" : "dark"
+    );
+  }
+
+  const [summary, setSummary] = useState([]);
+
+  useEffect(() => {
+    const regex = new RegExp(
+      "^(https?://)?(www.)?(arxiv.org/abs/)[a-zA-Z0-9]{4,9}.[a-zA-Z0-9]{4,9}$"
+    );
+
+    if (regex.test(link) && tag.length > 0) {
+      setInputValid(true);
+    } else {
+      setInputValid(false);
     }
-    const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
-    // const [linkPopover, toggleLinkPopover] = useState(false);
-    // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
-    const [link, setLink] = useState('');
-    const [tag, setTag] = useState(['']);
-    const [inputValid, setInputValid] = useState(false);
-    const [loadingText, setLoadingText] = useState('Loading...');
+  }, [link, tag]);
 
-    useEffect(() => {
-        if (summaryState === SummaryStateEnum.hidden) {
-            // document.documentElement.style.setProperty("--window-padding", "1rem");
-            // document.documentElement.style.setProperty("--container-border-radius", "40px");
-        }
-    }, [summaryState])
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1800) {
+        document.documentElement.style.setProperty("--window-padding", "2rem");
+        document.documentElement.style.setProperty(
+          "--container-border-radius",
+          "40px"
+        );
+      }
+    };
+    handleResize();
 
-    useEffect(() => {
-        // TODO: only check after user submit
-        const regex = new RegExp('^(https?://)?(www.)?(arxiv.org/abs/)[a-zA-Z0-9]{4,9}.[a-zA-Z0-9]{4,9}$');
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
-        if (regex.test(link) && tag.length > 0) {
-            setInputValid(true);
-        } else {
-            //TODO: change to false
-            setInputValid(true);
-        }
+  const tags = [
+    { value: "experiments and results", label: "Experiments and Results" },
+  ];
 
-    }, [link, tag])
+  const summarize = async () => {
+    setSummaryState(SummaryStateEnum.loading);
 
-    useEffect(() => {
-        console.log(window.innerWidth);
-        const handleResize = () => {
-
-            if (window.innerWidth > 1800) {
-                console.log('large');
-                document.documentElement.style.setProperty("--window-padding", "2rem");
-                document.documentElement.style.setProperty("--container-border-radius", "40px");
-            }
-        }
-        handleResize();
-
-        window.addEventListener('resize', handleResize)
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [])
-
-
-    const tags = [
-        {value: 'experiments and results', label: 'Experiments and Results'},
-    ];
-
-    const summarize = async () => {
-        setSummaryState(SummaryStateEnum.loading);
-        // if (summaryState === SummaryStateEnum.loading) {
-        //     setSummaryState(SummaryStateEnum.hidden)
-        // }
-        const summary = await fetchAPI({
-            url: link,
-            keyword: tag,
-        })
-        // console.log(summary);
-        // setSummaryState(SummaryStateEnum.success);
+    let summary;
+    try {
+      summary = await fetchAPI({
+        url: link,
+        keyword: tag,
+      });
+    } catch (error) {
+      console.log(error);
+      setSummaryState(SummaryStateEnum.error);
+    } finally {
+      toggleSearchExpanded(false);
+      setSummary(summary);
+      setSummaryState(SummaryStateEnum.success);
     }
+  };
 
-    // const summary = fetchAPI('http://localhost:8000/generate', {
-    //     url: 'https://arxiv.org/abs/1512.03385',
-    //     keyword: 'Experiments and results',
-    // })
+  return (
+    <>
+      <Head>
+        <title>Create Next App</title>
+        <meta name="description" content="Generated by create next app" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main
+        className={styles.main}
+        data-summary-state={summaryState}
+        style={{ fontFamily: font.style.fontFamily }}
+      >
+        <div
+          className={styles.container}
+          data-summary-state={summaryState}
+          data-expanded={isSearchExpanded}
+        >
+          <div
+            className={styles.expandable}
+            data-summary-state={summaryState}
+            aria-expanded={isSearchExpanded}
+          >
+            <div
+              className={styles.logo_content}
+              data-summary-state={summaryState}
+            >
+              <Image
+                src={logo}
+                data-summary-state={summaryState}
+                placeholder="blur"
+                alt="logo"
+                className={styles.logo}
+                onClick={() => {
+                  setSummaryState(SummaryStateEnum.hidden);
+                  toggleSearchExpanded(true);
+                }}
+              ></Image>
+              <h2
+                className={styles.title}
+                data-summary-state={summaryState}
+                style={{ fontFamily: font2.style.fontFamily }}
+              >
+                {summaryState === SummaryStateEnum.hidden ? (
+                  <>
+                    We <span>summ</span>arize <br /> your Arxiv{" "}
+                    <span>Paper</span>
+                  </>
+                ) : (
+                  <span
+                    onClick={() => {
+                      setSummaryState(SummaryStateEnum.hidden);
+                      toggleSearchExpanded(true);
+                    }}
+                    className={styles.productName}
+                  >
+                    PaperSumm
+                  </span>
+                )}
+              </h2>
+              <ActionIcon
+                size="lg"
+                radius="xl"
+                color={colorScheme === "dark" ? "gray" : "blue"}
+                variant={colorScheme === "dark" ? "filled" : "light"}
+                onClick={toggleScheme}
+                className={styles.themeSwitcher}
+                data-expanded={isSearchExpanded}
+                data-summary-state={summaryState}
+              >
+                {colorScheme === "dark" ? (
+                  <Sun size={24} color="#1994fb" weight="light" />
+                ) : (
+                  <Moon size={24} color="#1994fb" weight="light" />
+                )}
+              </ActionIcon>
+            </div>
+            <div className={styles.inputs} data-summary-state={summaryState}>
+              <Input.Wrapper
+                label="Input arxiv URL to Research Paper"
+                className={styles.input_box}
+                classNames={{ label: classes.label }}
+                size="md"
+              >
+                <Input
+                  icon={
+                    <MagnifyingGlass size={24} color="#1994fb" weight="light" />
+                  }
+                  placeholder="https://arxiv.org/abs/1512.03385"
+                  radius="xl"
+                  size="md"
+                  value={link}
+                  onChange={(event) => setLink(event.currentTarget.value)}
+                  classNames={{ input: classes.input }}
+                />
+              </Input.Wrapper>
+              <MultiSelect
+                data={tags}
+                label="Select a tag"
+                searchable
+                clearable
+                radius="xl"
+                size="md"
+                value={tag}
+                onChange={(value) => setTag(value)}
+                nothingFound="No tags found"
+                classNames={{
+                  label: classes.label,
+                  dropdown: classes.dropdown,
+                  item: classes.item,
+                  defaultValueLabel: classes.defaultValueLabel,
+                  nothingFound: classes.nothingFound,
+                }}
+              />
+              <div className={styles.buttons} data-summary-state={summaryState}>
+                <Button
+                  radius="xl"
+                  size="md"
+                  className={styles.button}
+                  onClick={summarize}
+                  style={{ fontFamily: font.style.fontFamily }}
+                  disabled={!inputValid}
+                >
+                  Summarize
+                </Button>
+              </div>
+              <h5 className={styles.credits} data-summary-state={summaryState}>
+                Product by the AI Team
+              </h5>
+            </div>
+          </div>
+          <ActionIcon
+            size="lg"
+            radius="xl"
+            onClick={() => {
+              toggleSearchExpanded(!isSearchExpanded);
+            }}
+            color={colorScheme === "dark" ? "gray" : "blue"}
+            variant={colorScheme === "dark" ? "filled" : "light"}
+            className={styles.expandIcon}
+            data-expanded={isSearchExpanded}
+            data-summary-state={summaryState}
+          >
+            <CaretCircleUp size={24} color="#1994fb" weight="light" />
+          </ActionIcon>
+          <div className={styles.output}>
+            <Loading show={summaryState === SummaryStateEnum.loading} />
+            <div className={styles.content} data-summary-state={summaryState}>
+              <div
+                className={styles.filler}
+                data-summary-state={summaryState}
+              ></div>
+              <div className={styles.summary} data-summary-state={summaryState}>
+                {/*<h2 className={styles.summary_caption}>Summary</h2>*/}
+                {summary ? (
+                  summary.map((section, index) => {
+                    let diagrams = [];
+                    if (section.Diagrams) {
+                      diagrams = [
+                        {
+                          type: section.Diagrams.Type,
+                          image: section.Diagrams.Figure,
+                          alt: section.Title,
+                          description: section.Diagrams.Description,
+                          index,
+                        },
+                      ];
+                    }
 
-    return (
-        <>
-            <Head>
-                <title>Create Next App</title>
-                <meta name="description" content="Generated by create next app"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                <link rel="icon" href="/favicon.ico"/>
-            </Head>
-            <main className={styles.main} data-summary-state={summaryState} style={{fontFamily: font.style.fontFamily}}>
-                {/*<div className={styles.animation}>*/}
-                {/*    <AnimationBackground/>*/}
-                {/*</div>*/}
-                <div className={styles.container} data-summary-state={summaryState}>
-                    {/*<div className={styles.info}>*/}
-                    {/*    <ActionIcon color="blue" size="xl" radius="xl" variant="filled">*/}
-                    {/*        <Info size={24} color="#fff" weight="light"/>*/}
-                    {/*    </ActionIcon>*/}
-                    {/*</div>*/}
-                    <div className={styles.logo_content} data-summary-state={summaryState}>
-                        <Image src={logo} data-summary-state={summaryState} placeholder="blur" alt="logo"
-                               className={styles.logo}></Image>
-                        <h2 className={styles.title} data-summary-state={summaryState}
-                            style={{fontFamily: font2.style.fontFamily}}>
-                            {summaryState === SummaryStateEnum.hidden ?
-                                <>We <span>summ</span>arize <br/> your Archive <span>Paper</span></>
-                                :
-                                <>PaperSumm</>
-                            }
-                        </h2>
-                    </div>
-                    <div className={styles.inputs} data-summary-state={summaryState}>
-                        <Input.Wrapper label="Input arxiv URL to Research Paper"
-                                       className={styles.input_box}
-                                       classNames={{label: classes.label}}
-                                       size="md">
-
-                            <Input
-                                icon={<MagnifyingGlass size={24} color="#1994fb" weight="light"/>}
-                                placeholder="https://arxiv.org/abs/1512.03385"
-                                radius="xl"
-                                size="md"
-                                value={link}
-                                onChange={(event) => setLink(event.currentTarget.value)}
-                                classNames={{input: classes.input}}
-                            />
-                        </Input.Wrapper>
-                        <MultiSelect
-                            data={tags}
-                            label="Select a tag"
-                            searchable
-                            clearable
-                            radius="xl"
-                            size="md"
-                            value={tag}
-                            onChange={(value) => setTag(value)}
-                            nothingFound="No tags found"
-                            classNames={{label: classes.label, dropdown: classes.dropdown, item: classes.item}}
-                        />
-                        <Button radius="xl" size="md" className={styles.button} onClick={summarize}
-                                style={{fontFamily: font.style.fontFamily}} disabled={!inputValid}>
-                            Summarize
-                        </Button>
-                    </div>
-                    <div className={styles.output}>
-                        <Loading show={summaryState === SummaryStateEnum.loading} text={loadingText}/>
-                        <div className={styles.content} data-summary-state={summaryState}>
-                            <div className={styles.filler} data-summary-state={summaryState}>
-                            </div>
-                            <div className={styles.summary} data-summary-state={summaryState}>
-                                <h2 className={styles.summary_caption}>Summary</h2>
-                                <Section title="Experiments and Results">
-                                    Nam ipsum ante, imperdiet et enim nec, fermentum ultrices sem. Aenean cursus nec
-                                    turpis quis pharetra. Mauris hendrerit metus id scelerisque tincidunt. Suspendisse
-                                    lacus ante, interdum et tincidunt non, faucibus in ex. Curabitur vel dolor
-                                    facilisis, ultricies augue et, efficitur nisi. Quisque posuere consequat elementum.
-                                    Integer sit amet rhoncus orci. Mauris sodales dolor dolor, maximus sagittis nulla
-                                    congue sit amet. Quisque sit amet euismod nibh. Sed eleifend ligula pulvinar massa
-                                    laoreet semper. Donec luctus mauris non faucibus volutpat. Phasellus vel porttitor
-                                    eros, vel cursus felis. Cras faucibus egestas tortor non facilisis. Nullam ultricies
-                                    vel nisl sit amet gravida.
-                                </Section>
-                                <Section title="Outcomes">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras pulvinar luctus quam,
-                                    ac dignissim est consequat in. Phasellus pharetra volutpat ornare. Pellentesque
-                                    interdum, purus nec lacinia tempor, eros felis volutpat lectus, vitae lobortis dui
-                                    urna eu risus. Morbi finibus ante eget lacus luctus consectetur. Phasellus eu congue
-                                    mi. Sed neque elit, lobortis quis tellus eu, pharetra sodales neque. Suspendisse
-                                    pellentesque ipsum id nibh porttitor, nec consectetur orci sollicitudin. Nunc non
-                                    nibh quis ante lacinia venenatis. Phasellus sed porta justo, quis volutpat felis.
-                                    Quisque cursus erat lacus, iaculis cursus tortor consequat ac. Curabitur aliquet
-                                    sapien in erat fringilla, quis egestas tellus vehicula. Nam egestas accumsan lacus
-                                    ut mattis. Donec lobortis libero eu erat pellentesque, ac volutpat leo commodo.
-                                    Morbi nec est laoreet, commodo tortor ut, venenatis erat. Nam eget velit purus. Sed
-                                    nec convallis lectus, a porta lectus.
-                                </Section>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </>
-    )
+                    return (
+                      <>
+                        <Section
+                          key={index}
+                          title={section.Title}
+                          diagrams={diagrams}
+                        >
+                          {section.Content}
+                        </Section>
+                      </>
+                    );
+                  })
+                ) : (
+                  <h2 className={styles.errText}>Error Loading Data!</h2>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
 }
