@@ -1,17 +1,6 @@
-# OpenAI-Hackathon
-
-`client.py` - Streamlit frontend  
-`server.py` - API integrations and server logics 
-
-## Branch name formatting
-
-`{app}/{#}/{name}`
-
-{app} - client/server  
-{#} - issue number  
-{name} - branch name  
+Checkout frontend branch to access next js client app
 
 ## Commands
 
-To run frontend -  
-`streamlit run client/main.py`
+To run backend -  
+`uvicorn main:app --reload`
