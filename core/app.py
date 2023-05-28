@@ -14,8 +14,8 @@ def Generate_summary(url,keyword):
         generated_content_dict = Generate(content_df,diagrams_df,keyword) #Generate content
 
         return (generated_content_dict)
-    except Exception:
-        Error = [{'Title':'An Unexpected Error Occurred','Content':'This error might be caused by exceeding the Rate Limits of the openAI API. We are looking forward to scaling our tool. So sincerely try another link or try after some time'}]
+    except Exception as e:
+        Error = [{'Error': str(e) }]
         return Error
 
 

@@ -5,7 +5,7 @@ import tiktoken
 
 load_dotenv() # Load the environment variables from the .env file
 
-openai_api_key = os.getenv('OPEN_AI') # Get the value of the API key
+openai_api_key = os.getenv('OPENAI_API_KEY') # Get the value of the API key
 openai.api_key=openai_api_key
 
 
