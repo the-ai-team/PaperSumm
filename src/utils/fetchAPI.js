@@ -40,32 +40,149 @@ const sampleData = [
     Content:
       "ResNet-101 improves the mAP by >>>3% over VGG-16 on the PASCAL VOC dataset. ResNet-based detection models win 1st place in several tracks in ILSVRC & COCO 2015 competitions. The COCO models are trained with an 8-GPU implementation, with a mini-batch size of 8 images for the RPN step and 16 images for the Fast R-CNN step. The RPN and Fast R-CNN steps are trained for 240k iterations with a learning rate of 0.001 and then for 80k iterations with 0.0001. ResNet-101 shows a 6% increase in mAP@[.5, .95] over VGG-16, which is a 28% relative improvement, solely contributed by the features learned by the better network. Box refinement, global context, and multi-scale testing are used to improve the mAP. Using the 80k+40k trainval set for training and the 20k test-dev set for evaluation, the single-model result achieves an mAP@.5 of 55.7% and an mAP@[.5, .95] of 34.9%. An ensemble of 3 networks achieves an mAP of 59.0% and 37.4% on the test-dev set, winning the 1st place in the detection task in COCO 2015. The same model is fine-tuned on the PASCAL VOC sets, achieving 85.6% mAP on PASCAL VOC 2007 and 83.8% on PASCAL VOC 2012. For the ImageNet Detection task, the same object detection algorithm as for MS COCO is used, achieving 58.8% mAP for the single model and 62.1% mAP for the ensemble of 3 models on the DET test set, winning the 1st place in ILSVRC 2015. For the ImageNet Localization task, the RPN method using ResNet-101 significantly reduces the center-crop error to 13.3%, and with dense and multi-scale testing, the error is reduced to 11.7%. Using ResNet-101 for predicting classes, the top-5 localization error is 14.4%.",
   },
-];
+  ];
+
+// const fetchData = async () => {
+//   try {
+//     const response = await fetch('/api/generate'); // Replace with the actual URL of your edge function
+//     if (response.ok) {
+//       const data = await response.json();
+//       console.log(data.message);
+//     } else {
+//       console.error('Error:', response.status);
+//     }
+//   } catch (error) {
+//     console.error('Error:', error);
+//   }
+// };
+//
+// fetchData();
+//
+
+// export const fetchAPI = async ({ url, keyword }) => {
+//   // FOR TESTING PURPOSES
+//   // const response = new Promise((resolve, reject) => {
+//   //   setTimeout(() => {
+//   //     resolve(sampleData);
+//   //   }, 6000);
+//   // });
+//   try {
+//     const endpoint = `/api/generate`;
+//     const data = {
+//       url,
+//       keyword: keyword[0],
+//     };
+//     console.log(JSON.stringify(data));
+//     const response = await fetch(endpoint, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Access-Control-Allow-Origin": "*",
+//       },
+//       body: JSON.stringify(data),
+//     });
+//     console.log(response.json());
+//     return await response.json();
+//   } catch (e) {
+//     console.error(e);
+//   }
+// };
+function validateSampleData(data) {
+  if(!data){
+    // "Data is undefined."
+    console.warn("Data is undefined.");
+    return [false];
+  }
+
+  if (!Array.isArray(data)) {
+    // "Data is not an array."
+    console.warn("Data is not an array.");
+    return [false];
+  }
+
+  for (const item of data) {
+    if(item.Error){
+      console.warn(item.Error);
+      return [false, item.Error];
+    }
+
+    if (!item.Title || typeof item.Title !== "string") {
+      // "Invalid or missing 'Title' field."
+      console.warn("Invalid or missing 'Title' field.");
+      return [false];
+    }
+
+    if (!item.Content || typeof item.Content !== "string") {
+      // "Invalid or missing 'Content' field."
+        console.warn("Invalid or missing 'Content' field.");
+      return [false];
+    }
+
+      if (item.Diagrams) {
+        if (typeof item.Diagrams !== "object") {
+          // "Invalid 'Diagrams' field."
+          console.warn("Invalid 'Diagrams' field.");
+          return [false];
+        }
+
+        if (!item.Diagrams.Type || typeof item.Diagrams.Type !== "string") {
+          // "Invalid or missing 'Diagrams.Type' field."
+            console.warn("Invalid or missing 'Diagrams.Type' field.");
+           return [false];
+        }
+
+        if (!item.Diagrams.Figure || !Array.isArray(item.Diagrams.Figure)) {
+          // "Invalid or missing 'Diagrams.Figure' field."
+            console.warn("Invalid or missing 'Diagrams.Figure' field.");
+           return [false];
+        }
+
+        if (!item.Diagrams.Description || typeof item.Diagrams.Description !== "string") {
+          // return "Invalid or missing 'Diagrams.Description' field."
+            console.warn("Invalid or missing 'Diagrams.Description' field.");
+          return [false];
+        }
+      }
+  }
+  return [true];
+}
 
 export const fetchAPI = async ({ url, keyword }) => {
-  // FOR TESTING PURPOSES
-  // const response = new Promise((resolve, reject) => {
+  console.time('fetchAPI')
+  try{
+    const endpoint = 'api/generate'
+    const response = (await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({url, keyword})
+    }));
+  //     const response = new Promise((resolve, reject) => {
   //   setTimeout(() => {
   //     resolve(sampleData);
-  //   }, 6000);
+  //   }, 2000);
   // });
-  try {
-    const endpoint = `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/generate`;
-    const data = {
-      url,
-      keyword: keyword[0],
-    };
-    console.log(JSON.stringify(data));
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify(data),
-    });
-    return await response.json();
-  } catch (e) {
+
+    console.log("res", await response.json())
+    const res = await response;
+    const summary = res;
+    console.log("summary", summary);
+    const validation = validateSampleData(summary);
+    console.log(summary);
+    if(validation[0]){
+      summary.valid = true;
+      return summary;
+    }
+    summary.valid = false;
+    summary.error = validation[1] || "Invalid response from API";
+    return summary;
+  }catch (e) {
+    const summary = {};
+    summary.valid = false;
+    summary.error = "Client error.";
     console.error(e);
+    return summary;
   }
-};
+  console.timeEnd('fetchAPI')
+}

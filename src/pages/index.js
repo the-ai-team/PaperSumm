@@ -294,7 +294,7 @@ export default function Home() {
               ></div>
               <div className={styles.summary} data-summary-state={summaryState}>
                 {/*<h2 className={styles.summary_caption}>Summary</h2>*/}
-                {summary ? (
+                {summary.valid ? (
                   summary.map((section, index) => {
                     let diagrams = [];
                     if (section.Diagrams) {
@@ -322,7 +322,7 @@ export default function Home() {
                     );
                   })
                 ) : (
-                  <h2 className={styles.errText}>Error Loading Data!</h2>
+                  <h2 className={styles.errText}>{summary.error}</h2>
                 )}
               </div>
             </div>
