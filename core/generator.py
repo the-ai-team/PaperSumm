@@ -65,100 +65,6 @@ info = """
 - In ImageNet Localization task, the RPN method using ResNet-101 reduces the center-crop error to 13.3%, and with dense and multi-scale testing, the error is 11.7% using ground truth classes.
 """
 
-sampleText = """
-##
- Introduction
- of
- Res
-idual
- Learning
- Framework
- ##
-
-The
- paper
- introduces
- a
- deep
- residual
- learning
- framework
- to
- address
- the
- degradation
- problem
- caused
- by
- increasing
- network
- depth
- in
- deep
- convolution
-al
- neural
- networks
-.
- The
- framework
- reform
-ulates
- layers
- as
- learning
- residual
- functions
- with
- reference
- to
- the
- layer
- inputs
-,
- instead
- of
- learning
- unre
-fer
-enced
- functions
-.
-
-
-##
- Emp
-irical
- Evidence
- of
- Res
-idual
- Networks
- ##
-
-The
- authors
- provide
- comprehensive
- empirical
- evidence
- showing
- that
- these
- residual
- networks
- are
- easier
- to
- optimize
- and
- can
- gain
- accuracy
- from
- considerably
-"""
-
 
 def get_related_info(keyword, context):
     """
@@ -181,40 +87,6 @@ def get_related_info(keyword, context):
         model="gpt-3.5-turbo",
     )
     return response["choices"][0]["message"]["content"].strip()
-
-
-# responses = []
-
-# def generate_content(
-#     context,
-#     keyword,
-#     model="gpt-3.5-turbo",
-#     stop_sequence=None
-# ):
-#     """
-#     Generate content based on the generated points of the paper
-#     """
-#     response = openai.ChatCompletion.create(  # Create a completions using the keyword and context
-#             messages = [{
-#                 "role":"user",
-#                 "content": f"""
-#                 Organize the following points related to {keyword} of a research by dividing into suitable subtopics. Generate a summerized paragraph for each subtopic\n\n
-#                 use this format,\n
-#                 ## generated subtopic ##\n
-#                 <Summarized paragraph under the subtopic>\n\n
-#                 points: {context}
-#                 organized document:
-#                  """
-#             }],
-#             temperature=0.5,
-#             max_tokens = 2048,
-#             top_p=1,
-#             frequency_penalty=0,
-#             presence_penalty=0,
-#             stop=stop_sequence,
-#             model=model,
-#         )
-#     return response["choices"][0]["message"]["content"].strip()
 
 
 def generate_content_with_stream(
@@ -253,21 +125,6 @@ def generate_content_with_stream(
         if "content" in data:
             content = data["content"]
             yield content
-
-
-# def content_dict(txt):
-#     """
-#     Create a dictionary of generated content by sections
-#     """
-#     txt = txt.replace('\n', '')
-#     sections = txt.split('##')  # split the text into topics and content using the '##' delimiter
-#     topics = sections[1::2]
-#     content = sections[2::2]
-#
-#     dict = [{'Title': topics[i], 'Content': content[i]} for i in
-#             range(len(topics))]  # Create a list of dictionaries using a list comprehension
-#
-#     return dict
 
 
 content_dicts = []
