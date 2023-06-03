@@ -228,11 +228,12 @@ def generate_content_with_stream(
     Generate content based on the generated points of the paper
     """
     responses = openai.ChatCompletion.create(  # Create a completions using the keyword and context
+        # TODO: remove text limit
         messages=[{
             "role": "user",
             "content": f"""
                 Organize the following points related to {keyword} of a research by dividing into suitable subtopics. 
-                Generate a summarized paragraph for each subtopic\n\n use this format,\n ## generated subtopic ##\n 
+                Generate a summarized paragraph for each subtopic. Make length of whole content less than 25 words\n\n use this format,\n ## generated subtopic ##\n 
                 <Summarized paragraph under the subtopic>\n\n points: {context} 
                 organized document:
                  """
@@ -269,7 +270,8 @@ def generate_content_with_stream(
 #     return dict
 
 
-content_dict = {}
+content_dicts = []
+content_dict_temp = {}
 content_start = False
 content_type = {
     0: "title",
@@ -279,6 +281,7 @@ content_type_selected = 1
 content_temp = ""
 titles_count = 0
 paragraphs_count = 0
+
 
 def generate_content_dict_stream(content):
     """
@@ -294,7 +297,9 @@ def generate_content_dict_stream(content):
         if string_chunk == "##":
             # Add block of temporary stored content to the dictionary
             if content_temp != "":
-                content_dict[content_type[content_type_selected]] = content_temp
+                content_dict_temp[content_type[content_type_selected]] = content_temp
+                if content_type_selected == 1:
+                    content_dicts.append(content_dict_temp)
                 # Add end tag
                 output += f"</{content_type[content_type_selected]}>"
 
@@ -305,7 +310,8 @@ def generate_content_dict_stream(content):
             content_type_selected = 1 if content_type_selected == 0 else 0
 
             # Add start tag
-            output += f"<{content_type[content_type_selected]}>"
+            index = titles_count if content_type_selected == 0 else paragraphs_count
+            output += f"<{content_type[content_type_selected]} index={index}>"
 
             # Increment counters
             if content_type_selected == 0:
@@ -332,7 +338,7 @@ def match_diagrams(diagrams_df, generated_content_dict, threshold=0.15):
     """
     for section in generated_content_dict:
         content_embeddings = \
-        openai.Embedding.create(input=section['Content'], engine='text-embedding-ada-002')['data'][0][
+        openai.Embedding.create(input=section['content'], engine='text-embedding-ada-002')['data'][0][
             'embedding']  # Get Embeddings
         diagrams_df['Distances'] = distances_from_embeddings(content_embeddings, diagrams_df['Embeddings'].values,
                                                              distance_metric='cosine')  # Get the distances from the embeddings
@@ -340,8 +346,8 @@ def match_diagrams(diagrams_df, generated_content_dict, threshold=0.15):
         diagrams_df = diagrams_df.sort_values('Distances', ascending=True)  # sort ascending as distances
 
         if diagrams_df['Distances'][0] < threshold:
-            section['Diagrams'] = {'Type': diagrams_df['Type'][0], 'Figure': diagrams_df['Figure'][0],
-                                   'Description': diagrams_df['Text'][0]}
+            section['diagrams'] = {'type': diagrams_df['Type'][0], 'figure': diagrams_df['Figure'][0],
+                                   'description': diagrams_df['Text'][0]}
             # diagrams_df = diagrams_df.drop(index = 0)
 
     return generated_content_dict
@@ -377,6 +383,6 @@ def Generate(content_df, diagrams_df, keyword):
         }
         yield output
 
-    full_output = match_diagrams(diagrams_df, content_dict)  # match diagrams
+    full_output = match_diagrams(diagrams_df, content_dicts)  # match diagrams
 
     return full_output

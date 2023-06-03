@@ -52,6 +52,7 @@ def Generate_summary(url,keyword):
             "content": "Something went wrong. Please try again later."
         }
         print(e)
+        raise e
         return error
 
 summary = Generate_summary('https://arxiv.org/abs/1512.03385', 'Experiments and results')

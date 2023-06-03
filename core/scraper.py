@@ -113,8 +113,6 @@ def Extract(url):
     """
     HTML_url = link_parser(url)
     soup = get_page(HTML_url)
-    if not soup:
-        return False
 
     content_df = extract_context(soup)
     diagrams_df = extract_diagrams(soup)
