@@ -15,10 +15,8 @@ def Generate_summary(url,keyword):
 
         generated_content = Generate(content_df, diagrams_df, keyword)  # Generate content
 
-        for output in generated_content:
-            print(output)
-
-        return generated_content
+        for chunk in generated_content:
+            yield chunk
 
     except requests.exceptions.HTTPError as e:
         error = {
@@ -52,8 +50,8 @@ def Generate_summary(url,keyword):
             "content": "Something went wrong. Please try again later."
         }
         print(e)
-        raise e
         return error
 
-summary = Generate_summary('https://arxiv.org/abs/1512.03385', 'Experiments and results')
-print(summary)
+# summary = Generate_summary('https://arxiv.org/abs/1512.03385', 'Experiments and results')
+# for i in summary:
+#     pass

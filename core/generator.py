@@ -1,3 +1,4 @@
+import copy
 import json
 from core.embeddings import openai
 import concurrent.futures
@@ -105,7 +106,7 @@ def generate_content_with_stream(
             "role": "user",
             "content": f"""
                 Organize the following points related to {keyword} of a research by dividing into suitable subtopics. 
-                Generate a summarized paragraph for each subtopic. Make length of whole content less than 25 words\n\n use this format,\n ## generated subtopic ##\n 
+                Generate a summarized paragraph for each subtopic (max 10 words).\n\n use this format,\n ## generated subtopic ##\n 
                 <Summarized paragraph under the subtopic>\n\n points: {context} 
                 organized document:
                  """
@@ -146,7 +147,7 @@ def generate_content_dict_stream(content):
     """
     content = content.replace('\n', '')
 
-    global content_start, content_type_selected, content_temp, titles_count, paragraphs_count
+    global content_dicts, content_dict_temp, content_start, content_type_selected, content_temp, titles_count, paragraphs_count
 
     output = ""
 
@@ -156,7 +157,7 @@ def generate_content_dict_stream(content):
             if content_temp != "":
                 content_dict_temp[content_type[content_type_selected]] = content_temp
                 if content_type_selected == 1:
-                    content_dicts.append(content_dict_temp)
+                    content_dicts.append(copy.deepcopy(content_dict_temp))
                 # Add end tag
                 output += f"</{content_type[content_type_selected]}>"
 
@@ -178,13 +179,13 @@ def generate_content_dict_stream(content):
 
             continue
         else:
-            content_temp += string_chunk
-
             # output content
             if string_chunk == "":
                 output += " "
+                content_temp += " "
             else:
                 output += string_chunk
+                content_temp += string_chunk
 
     return output
 
@@ -240,6 +241,8 @@ def Generate(content_df, diagrams_df, keyword):
         }
         yield output
 
-    full_output = match_diagrams(diagrams_df, content_dicts)  # match diagrams
-
-    return full_output
+    full_output = {
+        "type": "full-content",
+        "content": match_diagrams(diagrams_df, content_dicts)  # match diagrams
+    }
+    yield full_output
