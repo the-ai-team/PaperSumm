@@ -1,18 +1,18 @@
 .wave {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 1em;
-    gap: 2em;
-    opacity: 20%;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1em;
+  gap: 2em;
+  opacity: 20%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .circle {
-    height: 100%;
-    aspect-ratio: 1;
-    background: white;
-    border-radius: 50%;
+  height: 100%;
+  aspect-ratio: 1;
+  background: white;
+  border-radius: 50%;
 }

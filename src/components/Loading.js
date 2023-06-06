@@ -1,33 +1,33 @@
-import styles from "@/styles/Loading.module.css";
-import { useEffect, useState } from "react";
+import styles from '@/styles/Loading.module.css';
+import { useEffect, useState } from 'react';
 
 export function Loading({ show }) {
-  const [loadingText, setLoadingText] = useState("Loading...");
+  const [loadingText, setLoadingText] = useState('Loading...');
 
   const loadingTexts = [
-    "Extracting insights",
-    "Synthesizing knowledge",
+    'Extracting insights',
+    'Synthesizing knowledge',
     "Unveiling paper's essence",
-    "Crafting brilliance",
-    "Distilling scholarly wisdom",
-    "Unleashing research power",
-    "Awaiting key findings",
-    "Unlocking hidden gems",
-    "Converting complexity",
-    "Summarizing with precision",
+    'Crafting brilliance',
+    'Distilling scholarly wisdom',
+    'Unleashing research power',
+    'Awaiting key findings',
+    'Unlocking hidden gems',
+    'Converting complexity',
+    'Summarizing with precision',
   ];
 
   const appreciationTexts = [
-    "Patience fuels knowledge!",
-    "Thanks for understanding.",
-    "Grateful for unraveling mysteries.",
-    "Savoring research details!",
-    "Fueling research passion.",
-    "Value your time and trust.",
-    "Trusting us on the journey.",
-    "Commitment to excellence.",
-    "Deciphering research tapestry.",
-    "Grateful for research trust.",
+    'Patience fuels knowledge!',
+    'Thanks for understanding.',
+    'Grateful for unraveling mysteries.',
+    'Savoring research details!',
+    'Fueling research passion.',
+    'Value your time and trust.',
+    'Trusting us on the journey.',
+    'Commitment to excellence.',
+    'Deciphering research tapestry.',
+    'Grateful for research trust.',
   ];
 
   // make a timer changes the text every 3 seconds
@@ -42,7 +42,7 @@ export function Loading({ show }) {
   });
 
   useEffect(() => {
-    setLoadingText("Loading...");
+    setLoadingText('Loading...');
   }, [show]);
 
   return (

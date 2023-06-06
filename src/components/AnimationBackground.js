@@ -1,5 +1,5 @@
-import styles from "@/styles/Animation.module.css";
-import { useEffect, useState } from "react";
+import styles from '@/styles/Animation.module.css';
+import { useEffect, useState } from 'react';
 
 export function AnimationBackground() {
   const circleRadius = 200;

@@ -1,5 +1,5 @@
-import Head from "next/head";
-import styles from "@/styles/Home.module.css";
+import Head from 'next/head';
+import styles from '@/styles/Home.module.css';
 import {
   ActionIcon,
   Button,
@@ -7,42 +7,42 @@ import {
   Input,
   MultiSelect,
   useMantineColorScheme,
-} from "@mantine/core";
+} from '@mantine/core';
 import {
   CaretCircleUp,
   MagnifyingGlass,
   Moon,
   Sun,
-} from "@phosphor-icons/react";
-import { Loading } from "@/components/Loading";
-import { Inter, Roboto_Mono } from "next/font/google";
-import { Section } from "@/components/Section";
-import { useEffect, useState } from "react";
-import logo from "@/assets/logo.png";
-import Image from "next/image";
-import { fetchAPI } from "@/utils/fetchAPI";
+} from '@phosphor-icons/react';
+import { Loading } from '@/components/Loading';
+import { Inter, Roboto_Mono } from 'next/font/google';
+import { Section } from '@/components/Section';
+import { useEffect, useState } from 'react';
+import logo from '@/assets/logo.png';
+import Image from 'next/image';
+import { fetchAPI } from '@/utils/fetchAPI';
 
-const font = Roboto_Mono({ subsets: ["latin"], weight: "variable" });
-const font2 = Inter({ subsets: ["latin"], weight: "variable" });
+const font = Roboto_Mono({ subsets: ['latin'], weight: 'variable' });
+const font2 = Inter({ subsets: ['latin'], weight: 'variable' });
 
 const useStyles = createStyles((theme) => ({
   label: {
     fontFamily: font.style.fontFamily,
-    marginBottom: "0.5em",
+    marginBottom: '0.5em',
   },
   input: {
     fontFamily: font.style.fontFamily,
   },
   dropdown: {
     fontFamily: font.style.fontFamily,
-    borderRadius: "1rem",
-    padding: "2rem",
+    borderRadius: '1rem',
+    padding: '2rem',
   },
   item: {
     fontFamily: font.style.fontFamily,
-    borderRadius: "1rem",
-    fontSize: ".875rem",
-    padding: "0.5rem 1rem",
+    borderRadius: '1rem',
+    fontSize: '.875rem',
+    padding: '0.5rem 1rem',
   },
   defaultValueLabel: {
     fontFamily: font.style.fontFamily,
@@ -56,15 +56,15 @@ export default function Home() {
   const { classes } = useStyles();
 
   const SummaryStateEnum = {
-    hidden: "hidden",
-    loading: "loading",
-    success: "success",
-    error: "error",
+    hidden: 'hidden',
+    loading: 'loading',
+    success: 'success',
+    error: 'error',
   };
   const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
   // const [linkPopover, toggleLinkPopover] = useState(false);
   // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
-  const [link, setLink] = useState("");
+  const [link, setLink] = useState('');
   //TODO: remove tag
   const [tag, setTag] = useState([]);
   const [inputValid, setInputValid] = useState(false);
@@ -76,12 +76,12 @@ export default function Home() {
   function toggleScheme() {
     toggleColorScheme();
     document.documentElement.setAttribute(
-      "data-theme",
-      colorScheme === "dark" ? "light" : "dark"
+      'data-theme',
+      colorScheme === 'dark' ? 'light' : 'dark'
     );
     localStorage.setItem(
-      "colorScheme",
-      colorScheme === "dark" ? "light" : "dark"
+      'colorScheme',
+      colorScheme === 'dark' ? 'light' : 'dark'
     );
   }
 
@@ -89,7 +89,7 @@ export default function Home() {
 
   useEffect(() => {
     const regex = new RegExp(
-      "^(https?://)?(www.)?(arxiv.org/abs/)[a-zA-Z0-9]{4,9}.[a-zA-Z0-9]{4,9}$"
+      '^(https?://)?(www.)?(arxiv.org/abs/)[a-zA-Z0-9]{4,9}.[a-zA-Z0-9]{4,9}$'
     );
 
     if (regex.test(link) && tag.length > 0) {
@@ -102,23 +102,23 @@ export default function Home() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1800) {
-        document.documentElement.style.setProperty("--window-padding", "2rem");
+        document.documentElement.style.setProperty('--window-padding', '2rem');
         document.documentElement.style.setProperty(
-          "--container-border-radius",
-          "40px"
+          '--container-border-radius',
+          '40px'
         );
       }
     };
     handleResize();
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   const tags = [
-    { value: "experiments and results", label: "Experiments and Results" },
+    { value: 'experiments and results', label: 'Experiments and Results' },
   ];
 
   const summarize = async () => {
@@ -185,7 +185,7 @@ export default function Home() {
               >
                 {summaryState === SummaryStateEnum.hidden ? (
                   <>
-                    We <span>summ</span>arize <br /> your Arxiv{" "}
+                    We <span>summ</span>arize <br /> your Arxiv{' '}
                     <span>Paper</span>
                   </>
                 ) : (
@@ -203,14 +203,14 @@ export default function Home() {
               <ActionIcon
                 size="lg"
                 radius="xl"
-                color={colorScheme === "dark" ? "gray" : "blue"}
-                variant={colorScheme === "dark" ? "filled" : "light"}
+                color={colorScheme === 'dark' ? 'gray' : 'blue'}
+                variant={colorScheme === 'dark' ? 'filled' : 'light'}
                 onClick={toggleScheme}
                 className={styles.themeSwitcher}
                 data-expanded={isSearchExpanded}
                 data-summary-state={summaryState}
               >
-                {colorScheme === "dark" ? (
+                {colorScheme === 'dark' ? (
                   <Sun size={24} color="#1994fb" weight="light" />
                 ) : (
                   <Moon size={24} color="#1994fb" weight="light" />
@@ -277,8 +277,8 @@ export default function Home() {
             onClick={() => {
               toggleSearchExpanded(!isSearchExpanded);
             }}
-            color={colorScheme === "dark" ? "gray" : "blue"}
-            variant={colorScheme === "dark" ? "filled" : "light"}
+            color={colorScheme === 'dark' ? 'gray' : 'blue'}
+            variant={colorScheme === 'dark' ? 'filled' : 'light'}
             className={styles.expandIcon}
             data-expanded={isSearchExpanded}
             data-summary-state={summaryState}

@@ -1,6 +1,6 @@
 .circle {
-    position: absolute;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 2px solid rgba(69, 69, 69, 1);
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid rgba(69, 69, 69, 1);
 }

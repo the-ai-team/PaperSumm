@@ -1,27 +1,27 @@
-import styles from "@/styles/Section.module.css";
-import { useEffect, useState } from "react";
-import randomColor from "randomcolor";
-import { Rubik } from "next/font/google";
-import { useMantineColorScheme } from "@mantine/core";
+import styles from '@/styles/Section.module.css';
+import { useEffect, useState } from 'react';
+import randomColor from 'randomcolor';
+import { Rubik } from 'next/font/google';
+import { useMantineColorScheme } from '@mantine/core';
 
-const font2 = Rubik({ subsets: ["latin"], weight: "variable" });
+const font2 = Rubik({ subsets: ['latin'], weight: 'variable' });
 
 export function Section({ title, diagrams, children }) {
-  const [bgDarkColor, setBgDarkColor] = useState("rgb(69,69,69)");
-  const [bgLightColor, setBgLightColor] = useState("rgb(239,239,239)"); // [1
+  const [bgDarkColor, setBgDarkColor] = useState('rgb(69,69,69)');
+  const [bgLightColor, setBgLightColor] = useState('rgb(239,239,239)'); // [1
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   useEffect(() => {
     setBgDarkColor(
       randomColor({
-        luminosity: "dark",
-        format: "rgba",
+        luminosity: 'dark',
+        format: 'rgba',
       })
     );
     setBgLightColor(
       randomColor({
-        luminosity: "light",
-        format: "rgb",
+        luminosity: 'light',
+        format: 'rgb',
       })
     );
   }, []);
@@ -30,7 +30,7 @@ export function Section({ title, diagrams, children }) {
     <section
       className={styles.section}
       style={{
-        backgroundColor: colorScheme === "dark" ? bgDarkColor : bgLightColor,
+        backgroundColor: colorScheme === 'dark' ? bgDarkColor : bgLightColor,
       }}
     >
       <h2>{title}</h2>

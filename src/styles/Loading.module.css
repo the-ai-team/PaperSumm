@@ -1,75 +1,79 @@
 .loading {
-    position: absolute;
-    overflow: hidden;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    transition: all .5s ease-in-out;
+  position: absolute;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
 }
 
-.loading[data-visible="true"] {
-    width: 200px;
-    height: 200px;
-    overflow: visible;
-    opacity: 1;
-    z-index: 10;
+.loading[data-visible='true'] {
+  width: 200px;
+  height: 200px;
+  overflow: visible;
+  opacity: 1;
+  z-index: 10;
 }
 
 .outer {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: #04c295;
-    background-image: radial-gradient(at 24.1% 70.9%, #289bfa 0px, transparent 50%),
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #04c295;
+  background-image: radial-gradient(
+      at 24.1% 70.9%,
+      #289bfa 0px,
+      transparent 50%
+    ),
     radial-gradient(at 77.9% 48.1%, #80ff63 0px, transparent 50%),
     radial-gradient(at 18.6% 24.5%, #08d10f 0px, transparent 50%),
     radial-gradient(at 46.9% 7.3%, #96eeff 0px, transparent 50%),
-    radial-gradient(at 62.4% 19.0%, #77def7 0px, transparent 50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: .5em;
-    animation: spin 4s linear infinite;
-    position: relative;
-    z-index: 10;
+    radial-gradient(at 62.4% 19%, #77def7 0px, transparent 50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em;
+  animation: spin 4s linear infinite;
+  position: relative;
+  z-index: 10;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .inner {
-    background: #323232;
-    background: var(--loading-background);
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 15px 0 #323232;
+  background: #323232;
+  background: var(--loading-background);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 0 15px 0 #323232;
 }
 
 .text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin: 0;
-    color: var(--text-color);
-    text-align: center;
-    transform: translate(-50%, -50%);
-    transition: all .25s ease;
-    z-index: 15;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  color: var(--text-color);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  transition: all 0.25s ease;
+  z-index: 15;
 }
 
-.loading[data-visible="false"] .text {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
+.loading[data-visible='false'] .text {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
 }
 
-.loading[data-visible="true"] .text {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+.loading[data-visible='true'] .text {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
