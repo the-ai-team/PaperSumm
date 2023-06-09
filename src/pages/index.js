@@ -124,9 +124,16 @@ export default function Home() {
   const summarize = async () => {
     setSummaryState(SummaryStateEnum.loading);
 
-    let summary;
+    let summary = {
+      valid: false,
+      error: '',
+    };
     try {
-      summary = await fetchAPI({
+      // summary = await fetchAPI({
+      //   url: link,
+      //   keyword: tag,
+      // });
+      fetchAPI({
         url: link,
         keyword: tag,
       });
