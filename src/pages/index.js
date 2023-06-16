@@ -121,30 +121,38 @@ export default function Home() {
     { value: 'experiments and results', label: 'Experiments and Results' },
   ];
 
-  const summarize = async () => {
-    setSummaryState(SummaryStateEnum.loading);
-
-    let summary = {
-      valid: false,
-      error: '',
-    };
-    try {
-      // summary = await fetchAPI({
-      //   url: link,
-      //   keyword: tag,
-      // });
-      fetchAPI({
-        url: link,
-        keyword: tag,
-      });
-    } catch (error) {
-      console.log(error);
-      setSummaryState(SummaryStateEnum.error);
-    } finally {
-      toggleSearchExpanded(false);
-      setSummary(summary);
+  useEffect(() => {
+    if (summary) {
       setSummaryState(SummaryStateEnum.success);
     }
+    // console.log(summary);
+  }, [summary]);
+
+  const summarize = async () => {
+    setSummaryState(SummaryStateEnum.loading);
+    fetchAPI({
+      url: link,
+      keyword: tag,
+      addToState: (summary) => setSummary(summary),
+    });
+    // let summary = {
+    //   valid: false,
+    //   error: '',
+    // };
+    // try {
+    //   summary = await fetchAPI({
+    //     url: link,
+    //     keyword: tag,
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    //   summary.error = "Client error: Couldn't fetch the summary"
+    //   setSummaryState(SummaryStateEnum.error);
+    // } finally {
+    //   toggleSearchExpanded(false);
+    //   setSummary(summary);
+    //   setSummaryState(SummaryStateEnum.success);
+    // }
   };
 
   return (
@@ -302,28 +310,28 @@ export default function Home() {
               <div className={styles.summary} data-summary-state={summaryState}>
                 {/*<h2 className={styles.summary_caption}>Summary</h2>*/}
                 {summary.valid ? (
-                  summary.map((section, index) => {
-                    let diagrams = [];
-                    if (section.Diagrams) {
-                      diagrams = [
-                        {
-                          type: section.Diagrams.Type,
-                          image: section.Diagrams.Figure,
-                          alt: section.Title,
-                          description: section.Diagrams.Description,
-                          index,
-                        },
-                      ];
-                    }
+                  summary.value.map((section, index) => {
+                    // let diagrams = [];
+                    // if (section.Diagrams) {
+                    //   diagrams = [
+                    //     {
+                    //       type: section.Diagrams.Type,
+                    //       image: section.Diagrams.Figure,
+                    //       alt: section.Title,
+                    //       description: section.Diagrams.Description,
+                    //       index,
+                    //     },
+                    //   ];
+                    // }
 
                     return (
                       <>
                         <Section
                           key={index}
-                          title={section.Title}
-                          diagrams={diagrams}
+                          title={section.title}
+                          // diagrams={diagrams}
                         >
-                          {section.Content}
+                          {section.content}
                         </Section>
                       </>
                     );

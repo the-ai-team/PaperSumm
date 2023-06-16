@@ -26,6 +26,10 @@ export function Section({ title, diagrams, children }) {
     );
   }, []);
 
+  if (!title && !children) {
+    return null;
+  }
+
   return (
     <section
       className={styles.section}

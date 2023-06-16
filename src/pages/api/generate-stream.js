@@ -27,12 +27,12 @@ export default async function handler(req, res) {
 
   eventSource.addEventListener('content', (event) => {
     console.log('content received');
-    res.write(`event: content\ndata: ${JSON.stringify(event.data)}\n\n`);
+    res.write(`event: content\ndata: ${event.data}\n\n`);
   });
 
   eventSource.addEventListener('full-content', (event) => {
     console.log('full-content received');
-    res.write(`event: full-content\ndata: ${JSON.stringify(event.data)}\n\n`);
+    res.write(`event: full-content\ndata: ${event.data}\n\n`);
     eventSource.close();
     res.end();
     return;
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
   eventSource.addEventListener('error', (event) => {
     console.log('error received');
-    res.write(`event: error\ndata: ${JSON.stringify(event.data)}\n\n`);
+    res.write(`event: error\ndata: ${event.data}\n\n`);
     eventSource.close();
     res.end();
     return;

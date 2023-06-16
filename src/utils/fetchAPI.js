@@ -150,15 +150,82 @@ function validateSampleData(data) {
   return [true];
 }
 
-export const fetchAPI = async ({ url, keyword }) => {
+const ContentType = {
+  0: 'title',
+  1: 'paragraph',
+  2: 'delimiter',
+};
+
+export const fetchAPI = async ({ url, keyword, addToState }) => {
+  const summary = [];
+  let currentIndex = -1;
+  let currentType = ContentType[0];
+
   console.time('fetchAPI');
   try {
     const endpoint = '/api/generate-stream';
     const eventSource = new EventSource(endpoint);
-    console.log(eventSource);
-    
+
     eventSource.addEventListener('content', (event) => {
-      console.log('content received', event.data);
+      const content = JSON.parse(event.data);
+
+      if (!Array.isArray(content)) {
+        console.error('Invalid content received, not an array');
+        // TODO: throw errors
+        return;
+      }
+
+      for (const item of content) {
+        if (!item.content_type) {
+          console.error('Invalid content received, content_type is missing');
+          return;
+        }
+
+        const contentType = item.content_type;
+
+        // only if it's not a delimiter
+        let contentIndex;
+        const contentText = item.text;
+
+        // Validate content index
+        try {
+          contentIndex = parseInt(item.index);
+          console.log('contentIndex', contentIndex);
+        } catch (e) {
+          console.error(
+            'Invalid content received, content_index is not a number'
+          );
+          return;
+        }
+
+        if (contentIndex < 0) {
+          console.error('Invalid content received, content_index is negative');
+          return;
+        }
+
+        if (contentIndex > currentIndex) {
+          while (contentIndex > currentIndex) {
+            summary.push({ title: '', content: '' });
+            currentIndex++;
+          }
+        }
+        // ==== //
+
+        // Add content to summary
+        if (contentType === 'title') {
+          console.log('title', contentText);
+          summary[contentIndex].title += contentText;
+        } else if (contentType === 'paragraph') {
+          console.log('paragraph', contentText);
+          summary[contentIndex].content += contentText;
+        } else if (contentType === 'delimiter') {
+          continue;
+        }
+
+        addToState({ valid: true, value: summary });
+      }
+
+      // console.log('content received', content);
     });
 
     eventSource.addEventListener('full-content', (event) => {
@@ -171,12 +238,11 @@ export const fetchAPI = async ({ url, keyword }) => {
       eventSource.close();
     });
 
-    // const summary = {};
     // summary.valid = false;
     // summary.error = 'Client error.';
     // summary.error = validation[1] || 'Invalid response from API';
     // console.timeEnd('fetchAPI');
-    // return summary;
+    return summary;
   } catch (e) {
     const summary = {};
     summary.valid = false;
