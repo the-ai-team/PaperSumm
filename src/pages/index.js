@@ -64,7 +64,7 @@ export default function Home() {
   const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
   // const [linkPopover, toggleLinkPopover] = useState(false);
   // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
-  const [link, setLink] = useState('');
+  const [link, setLink] = useState('https://arxiv.org/abs/1512.03385');
   //TODO: remove tag
   const [tag, setTag] = useState([]);
   const [inputValid, setInputValid] = useState(false);

@@ -17,6 +17,7 @@
     "@mantine/hooks": "^6.0.7",
     "@mantine/next": "^6.0.7",
     "@phosphor-icons/react": "^2.0.8",
+    "axios": "^1.4.0",
     "classnames": "^2.3.2",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
@@ -27,6 +28,7 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "address": "^1.2.2",
     "prettier": "2.8.8"
   }
 }
