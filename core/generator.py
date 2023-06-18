@@ -318,7 +318,7 @@ def generate_content_dict_stream(content, content_metadata):
                 }
                 output.append(output_data)
 
-    return output, content_metadata
+    return output
 
 
 def match_diagrams(diagrams_df, generated_content_dict, threshold=0.15):
@@ -375,21 +375,19 @@ def Generate(content_df, diagrams_df, keyword):
     # print(generated_content)
 
     # set metadata
-    content_metadata = {}
-    content_metadata["content_dicts"] = []
-    content_metadata["content_dict_temp"] = {}
-    content_metadata["content_type_selected"] = 1
-    content_metadata["content_temp"] = ""
-    content_metadata["titles_count"] = 0
-    content_metadata["paragraphs_count"] = 0
+    # content_metadata = {}
+    # content_metadata["content_dicts"] = []
+    # content_metadata["content_dict_temp"] = {}
+    # content_metadata["content_type_selected"] = 1
+    # content_metadata["content_temp"] = ""
+    # content_metadata["titles_count"] = 0
+    # content_metadata["paragraphs_count"] = 0
 
+    content_metadata = ContentMetadata()
     for generated_content_chunk in generated_content:
-        content_metadata = ContentMetadata()
-
-        (
-            generated_content_output,
-            updated_metadata,
-        ) = generate_content_dict_stream(generated_content_chunk, content_metadata)
+        generated_content_output = generate_content_dict_stream(
+            generated_content_chunk, content_metadata
+        )
         output = {"type": "content", "content": generated_content_output}
         yield output
 
