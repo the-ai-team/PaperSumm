@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { notifications } from '@mantine/notifications';
 import styles from '@/styles/Home.module.css';
 import {
   ActionIcon,
@@ -13,14 +14,15 @@ import {
   MagnifyingGlass,
   Moon,
   Sun,
+  Warning,
 } from '@phosphor-icons/react';
 import { Loading } from '@/components/Loading';
 import { Inter, Roboto_Mono } from 'next/font/google';
 import { Section } from '@/components/Section';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import logo from '@/assets/logo.png';
 import Image from 'next/image';
-import { fetchAPI } from '@/utils/fetchAPI';
+import { eventSource, fetchAPI } from '@/utils/fetchAPI';
 
 const font = Roboto_Mono({ subsets: ['latin'], weight: 'variable' });
 const font2 = Inter({ subsets: ['latin'], weight: 'variable' });
@@ -55,12 +57,15 @@ const useStyles = createStyles((theme) => ({
 export default function Home() {
   const { classes } = useStyles();
 
-  const SummaryStateEnum = {
-    hidden: 'hidden',
-    loading: 'loading',
-    success: 'success',
-    error: 'error',
-  };
+  const SummaryStateEnum = useMemo(() => {
+    return {
+      hidden: 'hidden',
+      loading: 'loading',
+      success: 'success',
+      error: 'error',
+    };
+  }, []);
+
   const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
   // const [linkPopover, toggleLinkPopover] = useState(false);
   // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
@@ -86,6 +91,7 @@ export default function Home() {
   }
 
   const [summary, setSummary] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const regex = new RegExp(
@@ -122,38 +128,58 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    let timeoutFunction;
+    clearTimeout(timeoutFunction);
+
     if (summary) {
       setSummaryState(SummaryStateEnum.success);
     }
-    // console.log(summary);
-  }, [summary]);
 
-  const summarize = async () => {
+    if (error) {
+      notifications.show({
+        title: 'Error',
+        message: error,
+        color: 'red',
+        icon: <Warning />,
+        autoClose: 8000,
+      });
+      timeoutFunction = setTimeout(() => {
+        setError('');
+      }, 8000);
+    }
+
+    return () => {
+      clearTimeout(timeoutFunction);
+    };
+  }, [SummaryStateEnum, summary, error]);
+
+  const summarize = () => {
+    if (eventSource) {
+      console.log('closing event source');
+      eventSource.close();
+    }
+    setSummary([]);
     setSummaryState(SummaryStateEnum.loading);
+
     fetchAPI({
       url: link,
       keyword: tag,
-      addToState: (summary) => setSummary(summary),
+      updateSummary: (summary) => setSummary(summary),
+      setError: (error) => setError(error),
     });
-    // let summary = {
-    //   valid: false,
-    //   error: '',
-    // };
-    // try {
-    //   summary = await fetchAPI({
-    //     url: link,
-    //     keyword: tag,
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    //   summary.error = "Client error: Couldn't fetch the summary"
-    //   setSummaryState(SummaryStateEnum.error);
-    // } finally {
-    //   toggleSearchExpanded(false);
-    //   setSummary(summary);
-    //   setSummaryState(SummaryStateEnum.success);
-    // }
   };
+
+  const btnRef = useRef(null);
+
+  useEffect(() => {
+    btnRef.current.addEventListener('click', summarize);
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -274,11 +300,23 @@ export default function Home() {
                   radius="xl"
                   size="md"
                   className={styles.button}
-                  onClick={summarize}
+                  // onClick={summarize}
+                  ref={btnRef}
                   style={{ fontFamily: font.style.fontFamily }}
                   disabled={!inputValid}
                 >
                   Summarize
+                </Button>
+                <Button
+                  radius="xl"
+                  size="md"
+                  className={styles.button}
+                  onClick={() => {
+                    eventSource.close();
+                  }}
+                  style={{ fontFamily: font.style.fontFamily }}
+                >
+                  End
                 </Button>
               </div>
               <h5 className={styles.credits} data-summary-state={summaryState}>
@@ -309,36 +347,34 @@ export default function Home() {
               ></div>
               <div className={styles.summary} data-summary-state={summaryState}>
                 {/*<h2 className={styles.summary_caption}>Summary</h2>*/}
-                {summary.valid ? (
-                  summary.value.map((section, index) => {
-                    // let diagrams = [];
-                    // if (section.Diagrams) {
-                    //   diagrams = [
-                    //     {
-                    //       type: section.Diagrams.Type,
-                    //       image: section.Diagrams.Figure,
-                    //       alt: section.Title,
-                    //       description: section.Diagrams.Description,
-                    //       index,
-                    //     },
-                    //   ];
-                    // }
+                {summary.valid
+                  ? summary.value.map((section, index) => {
+                      // let diagrams = [];
+                      // if (section.Diagrams) {
+                      //   diagrams = [
+                      //     {
+                      //       type: section.Diagrams.Type,
+                      //       image: section.Diagrams.Figure,
+                      //       alt: section.Title,
+                      //       description: section.Diagrams.Description,
+                      //       index,
+                      //     },
+                      //   ];
+                      // }
 
-                    return (
-                      <>
-                        <Section
-                          key={index}
-                          title={section.title}
-                          // diagrams={diagrams}
-                        >
-                          {section.content}
-                        </Section>
-                      </>
-                    );
-                  })
-                ) : (
-                  <h2 className={styles.errText}>{summary.error}</h2>
-                )}
+                      return (
+                        <>
+                          <Section
+                            key={index}
+                            title={section.title}
+                            // diagrams={diagrams}
+                          >
+                            {section.content}
+                          </Section>
+                        </>
+                      );
+                    })
+                  : null}
               </div>
             </div>
           </div>

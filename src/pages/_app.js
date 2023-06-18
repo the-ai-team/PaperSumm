@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import { ColorSchemeProvider, MantineProvider } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { Notifications } from '@mantine/notifications';
 
 export default function App({ Component, pageProps }) {
   const [colorScheme, setColorScheme] = useState('light');
@@ -29,6 +30,7 @@ export default function App({ Component, pageProps }) {
             colorScheme,
           }}
         >
+          <Notifications />
           <main>
             <Component {...pageProps} />
           </main>

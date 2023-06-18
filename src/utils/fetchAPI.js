@@ -150,22 +150,27 @@ function validateSampleData(data) {
   return [true];
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const ContentType = {
   0: 'title',
   1: 'paragraph',
   2: 'delimiter',
 };
 
-export const fetchAPI = async ({ url, keyword, addToState }) => {
+export let eventSource = null;
+
+export const fetchAPI = async ({ updateSummary, setError }) => {
+  const endpoint = 'http://localhost:3000/api/generate-stream';
+  eventSource = new EventSource(endpoint);
+
   const summary = [];
   let currentIndex = -1;
-  let currentType = ContentType[0];
 
   console.time('fetchAPI');
   try {
-    const endpoint = '/api/generate-stream';
-    const eventSource = new EventSource(endpoint);
-
     eventSource.addEventListener('content', (event) => {
       const content = JSON.parse(event.data);
 
@@ -182,6 +187,11 @@ export const fetchAPI = async ({ url, keyword, addToState }) => {
         }
 
         const contentType = item.content_type;
+
+        if (contentType !== ContentType[0] && contentType !== ContentType[1]) {
+          console.error('Invalid content received, content_type is invalid');
+          return;
+        }
 
         // only if it's not a delimiter
         let contentIndex;
@@ -214,18 +224,26 @@ export const fetchAPI = async ({ url, keyword, addToState }) => {
         // Add content to summary
         if (contentType === 'title') {
           console.log('title', contentText);
-          summary[contentIndex].title += contentText;
-        } else if (contentType === 'paragraph') {
+
+          contentText.split('').forEach(async (letter) => {
+            summary[contentIndex].title += letter;
+            // await sleep(10000);
+            updateSummary({ valid: true, value: summary });
+          });
+        }
+        if (contentType === 'paragraph') {
           console.log('paragraph', contentText);
-          summary[contentIndex].content += contentText;
-        } else if (contentType === 'delimiter') {
-          continue;
+
+          contentText.split('').forEach(async (letter) => {
+            summary[contentIndex].content += letter;
+            // console.log(letter);
+            // await sleep(10000);
+            updateSummary({ valid: true, value: summary });
+          });
         }
 
-        addToState({ valid: true, value: summary });
+        console.log('content collected');
       }
-
-      // console.log('content received', content);
     });
 
     eventSource.addEventListener('full-content', (event) => {
@@ -234,22 +252,20 @@ export const fetchAPI = async ({ url, keyword, addToState }) => {
     });
 
     eventSource.addEventListener('error', (event) => {
-      console.log(`error received. ${JSON.stringify(event)}`);
+      console.log(event.data);
+      if (event.data) {
+        try {
+          setError(JSON.parse(event.data));
+        } catch (error) {}
+      }
       eventSource.close();
     });
 
-    // summary.valid = false;
-    // summary.error = 'Client error.';
-    // summary.error = validation[1] || 'Invalid response from API';
-    // console.timeEnd('fetchAPI');
-    return summary;
-  } catch (e) {
-    const summary = {};
-    summary.valid = false;
-    summary.error = 'Client error.';
-    console.error(e);
     console.timeEnd('fetchAPI');
-    return summary;
+  } catch (e) {
+    console.error(e);
+    setError('Client error.');
+    console.timeEnd('fetchAPI');
   }
 };
 
