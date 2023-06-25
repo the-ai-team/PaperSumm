@@ -4,3 +4,6 @@ Checkout frontend branch to access next js client app
 
 To run backend -  
 `uvicorn main:app --reload`
+
+To deploy -
+`gcloud run deploy`
