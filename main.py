@@ -1,5 +1,6 @@
 import asyncio
 import json
+import uuid
 from multiprocessing import connection
 
 from fastapi import FastAPI, Request, Query
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
 
-STREAM_DELAY = 100  # milliseconds
+STREAM_DELAY = 20  # milliseconds
 RETRY_TIMEOUT = 15000  # milliseconds
 
 from core.app import Generate_summary
@@ -45,18 +46,12 @@ async def generate(request: Request, url: str = Query(...), keyword: str = Query
             if await request.is_disconnected():
                 break
 
-            # data = json.dumps(chunk["content"])
-            # print(data)
-
             yield {
                 "event": chunk["type"],
-                # TODO: Add id to chunk
-                "id": "message_id",
+                "id": uuid.uuid1(),
                 "retry": RETRY_TIMEOUT,
                 "data": json.dumps(chunk["content"]),
             }
-
-            print(chunk)
 
             await asyncio.sleep(STREAM_DELAY / 1000)
 

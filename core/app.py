@@ -11,12 +11,9 @@ def Generate_summary(url, keyword):
     Main fuction
     """
     try:
-        # TODO: reenable this
-        # content_df, diagrams_df = Extract(url)
+        content_df, diagrams_df = Extract(url)
 
-        # diagrams_df = Embeddings(diagrams_df)  # Get embeddings
-        content_df = "This is a test"
-        diagrams_df = "This is a test"
+        diagrams_df = Embeddings(diagrams_df)  # Get embeddings
 
         generated_content = Generate(
             content_df, diagrams_df, keyword
@@ -66,9 +63,3 @@ def Generate_summary(url, keyword):
         }
         print(f"Papersumm (Other errors): {e}")
         yield error
-
-
-# summary = Generate_summary('https://arxiv.org/abs/1512.03385', 'Experiments and results')
-# for i in summary:
-#     # print(i)
-#     pass
