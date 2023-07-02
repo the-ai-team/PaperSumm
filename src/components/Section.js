@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import randomColor from 'randomcolor';
 import { Rubik } from 'next/font/google';
 import { useMantineColorScheme } from '@mantine/core';
-import Image from 'next/image';
 
 const font2 = Rubik({ subsets: ['latin'], weight: 'variable' });
 

@@ -74,7 +74,7 @@ const ContentType = {
 export let eventSource = null;
 
 export const fetchAPI = async ({ url, keyword, updateSummary, setError }) => {
-  const endpoint = 'http://localhost:3000/api/generate-stream';
+  const endpoint = '/api/generate-stream';
   const address = `${endpoint}?url=${encodeURIComponent(
     url
   )}&keyword=${encodeURIComponent(keyword)}`;
@@ -164,7 +164,7 @@ export const fetchAPI = async ({ url, keyword, updateSummary, setError }) => {
       eventSource.close();
 
       const content = JSON.parse(event.data);
-      console.log('full-content', content);
+      // console.log('full-content', content);
 
       if (!Array.isArray(content)) {
         return;
