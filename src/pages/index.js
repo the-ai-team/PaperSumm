@@ -121,6 +121,11 @@ export default function Home() {
 
   const tags = [
     { value: 'experiments and results', label: 'Experiments and Results' },
+    { value: 'proposed solution', label: 'Proposed Solution' },
+    {
+      value: 'building blocks and methodology',
+      label: 'Building Blocks and Methodology',
+    },
   ];
 
   useEffect(() => {
