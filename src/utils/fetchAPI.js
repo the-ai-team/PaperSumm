@@ -73,9 +73,13 @@ const ContentType = {
 
 export let eventSource = null;
 
-export const fetchAPI = async ({url, keyword, updateSummary, setError }) => {
+export const fetchAPI = async ({ url, keyword, updateSummary, setError }) => {
   const endpoint = 'http://localhost:3000/api/generate-stream';
-  eventSource = new EventSource(endpoint);
+  const address = `${endpoint}?url=${encodeURIComponent(
+    url
+  )}&keyword=${encodeURIComponent(keyword)}`;
+
+  eventSource = new EventSource(address);
 
   const summary = [];
   let currentIndex = -1;
@@ -160,7 +164,7 @@ export const fetchAPI = async ({url, keyword, updateSummary, setError }) => {
       eventSource.close();
 
       const content = JSON.parse(event.data);
-      // console.log('full-content', content);
+      console.log('full-content', content);
 
       if (!Array.isArray(content)) {
         return;

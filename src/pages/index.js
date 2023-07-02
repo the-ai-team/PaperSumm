@@ -19,7 +19,7 @@ import {
 import { Loading } from '@/components/Loading';
 import { Inter, Roboto_Mono } from 'next/font/google';
 import { Section } from '@/components/Section';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import logo from '@/assets/logo.png';
 import Image from 'next/image';
 import { eventSource, fetchAPI } from '@/utils/fetchAPI';
@@ -172,6 +172,12 @@ export default function Home() {
     }
     setSummary(null);
     setSummaryState(SummaryStateEnum.loading);
+    setError('');
+
+    if (!link || !tag) {
+      console.log('link or tag is empty', link, tag);
+      return;
+    }
 
     fetchAPI({
       url: link,
@@ -181,10 +187,7 @@ export default function Home() {
     });
   };
 
-  const btnRef = useRef(null);
-
   useEffect(() => {
-    btnRef.current.addEventListener('click', summarize);
 
     return () => {
       if (eventSource) {
@@ -285,7 +288,9 @@ export default function Home() {
                   radius="xl"
                   size="md"
                   value={link}
-                  onChange={(event) => setLink(event.currentTarget.value)}
+                  onChange={(event) => {
+                    setLink(event.target.value);
+                  }}
                   classNames={{ input: classes.input }}
                 />
               </Input.Wrapper>
@@ -297,7 +302,9 @@ export default function Home() {
                 radius="xl"
                 size="md"
                 value={tag}
-                onChange={(value) => setTag(value)}
+                onChange={(value) => {
+                  setTag(value);
+                }}
                 nothingFound="No tags found"
                 classNames={{
                   label: classes.label,
@@ -312,8 +319,7 @@ export default function Home() {
                   radius="xl"
                   size="md"
                   className={styles.button}
-                  // onClick={summarize}
-                  ref={btnRef}
+                  onClick={summarize}
                   style={{ fontFamily: font.style.fontFamily }}
                   disabled={!inputValid}
                 >
