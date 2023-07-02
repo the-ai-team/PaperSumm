@@ -24,7 +24,7 @@ import logo from '@/assets/logo.png';
 import Image from 'next/image';
 import { eventSource, fetchAPI } from '@/utils/fetchAPI';
 
-const font = Roboto_Mono({ subsets: ['latin'], weight: 'variable' });
+const font = Roboto_Mono({ subsets: ['latin'], weight: ['300', '500'] });
 const font2 = Inter({ subsets: ['latin'], weight: 'variable' });
 
 const useStyles = createStyles((theme) => ({
@@ -188,7 +188,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-
     return () => {
       if (eventSource) {
         eventSource.close();
