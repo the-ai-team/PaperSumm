@@ -17,3 +17,11 @@ Add `SERVER_ENDPOINT` to `.env` file.
 ```
 SERVER_ENDPOINT=http://localhost:8000
 ```
+
+## Deploy
+
+Deploy next js app on Firebase
+
+```bash
+firebase deploy
+```
