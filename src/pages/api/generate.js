@@ -1,6 +1,3 @@
-import { NextApiResponse } from 'next';
-import { express } from 'next';
-
 export default async function handler(req, res) {
   const endpoint = process.env.SERVER_ENDPOINT;
 

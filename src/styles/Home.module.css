@@ -259,16 +259,18 @@
 
 .credits {
   text-align: center;
-  color: rgba(219, 219, 219, 0.8);
-  width: 0;
+  color: rgb(121 121 121 / 80%);
+  max-width: 0;
+  height: 0;
   overflow: hidden;
   opacity: 0;
 }
 
 .credits[data-summary-state='hidden'] {
-  display: none;
   opacity: 1;
-  width: auto;
+  max-width: unset;
+  height: auto;
+  display: none;
 }
 
 .output {

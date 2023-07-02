@@ -67,14 +67,10 @@ export default function Home() {
   }, []);
 
   const [summaryState, setSummaryState] = useState(SummaryStateEnum.hidden);
-  // const [linkPopover, toggleLinkPopover] = useState(false);
-  // const [isOpenedHintForTag, setIsOpenedHintForTag] = useState(false);
-  const [link, setLink] = useState('https://arxiv.org/abs/1512.03385');
-  //TODO: remove tag
+  const [link, setLink] = useState('');
   const [tag, setTag] = useState([]);
   const [inputValid, setInputValid] = useState(false);
   const [isSearchExpanded, toggleSearchExpanded] = useState(true);
-  const [expandableHeightTaken, setExpandableHeightTaken] = useState(false);
 
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
@@ -90,7 +86,7 @@ export default function Home() {
     );
   }
 
-  const [summary, setSummary] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -136,6 +132,8 @@ export default function Home() {
     }
 
     if (error) {
+      setSummaryState(SummaryStateEnum.error);
+      toggleSearchExpanded(true);
       notifications.show({
         title: 'Error',
         message: error,
@@ -153,12 +151,26 @@ export default function Home() {
     };
   }, [SummaryStateEnum, summary, error]);
 
+  useEffect(() => {
+    switch (summaryState) {
+      case SummaryStateEnum.success:
+        toggleSearchExpanded(false);
+        break;
+
+      case SummaryStateEnum.error:
+        toggleSearchExpanded(true);
+
+      default:
+        break;
+    }
+  }, [SummaryStateEnum, summaryState]);
+
   const summarize = () => {
     if (eventSource) {
-      console.log('closing event source');
+      // console.log('closing event source');
       eventSource.close();
     }
-    setSummary([]);
+    setSummary(null);
     setSummaryState(SummaryStateEnum.loading);
 
     fetchAPI({
@@ -307,17 +319,6 @@ export default function Home() {
                 >
                   Summarize
                 </Button>
-                <Button
-                  radius="xl"
-                  size="md"
-                  className={styles.button}
-                  onClick={() => {
-                    eventSource.close();
-                  }}
-                  style={{ fontFamily: font.style.fontFamily }}
-                >
-                  End
-                </Button>
               </div>
               <h5 className={styles.credits} data-summary-state={summaryState}>
                 Product by the AI Team
@@ -329,6 +330,7 @@ export default function Home() {
             radius="xl"
             onClick={() => {
               toggleSearchExpanded(!isSearchExpanded);
+              console.log(!isSearchExpanded);
             }}
             color={colorScheme === 'dark' ? 'gray' : 'blue'}
             variant={colorScheme === 'dark' ? 'filled' : 'light'}
@@ -346,28 +348,29 @@ export default function Home() {
                 data-summary-state={summaryState}
               ></div>
               <div className={styles.summary} data-summary-state={summaryState}>
-                {/*<h2 className={styles.summary_caption}>Summary</h2>*/}
-                {summary.valid
+                {summary?.valid
                   ? summary.value.map((section, index) => {
-                      // let diagrams = [];
-                      // if (section.Diagrams) {
-                      //   diagrams = [
-                      //     {
-                      //       type: section.Diagrams.Type,
-                      //       image: section.Diagrams.Figure,
-                      //       alt: section.Title,
-                      //       description: section.Diagrams.Description,
-                      //       index,
-                      //     },
-                      //   ];
-                      // }
+                      let diagrams = [];
+
+                      // TODO: needs to remove this, from server side it must send a list of diagrams it self.
+                      if (section.diagrams) {
+                        diagrams = [
+                          {
+                            type: section.diagrams.type,
+                            figures: section.diagrams.figure,
+                            alt: section.title,
+                            description: section.diagrams.description,
+                            index,
+                          },
+                        ];
+                      }
 
                       return (
                         <>
                           <Section
                             key={index}
                             title={section.title}
-                            // diagrams={diagrams}
+                            diagrams={diagrams}
                           >
                             {section.content}
                           </Section>

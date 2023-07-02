@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 import randomColor from 'randomcolor';
 import { Rubik } from 'next/font/google';
 import { useMantineColorScheme } from '@mantine/core';
+import Image from 'next/image';
 
 const font2 = Rubik({ subsets: ['latin'], weight: 'variable' });
 
 export function Section({ title, diagrams, children }) {
   const [bgDarkColor, setBgDarkColor] = useState('rgb(69,69,69)');
-  const [bgLightColor, setBgLightColor] = useState('rgb(239,239,239)'); // [1
+  const [bgLightColor, setBgLightColor] = useState('rgb(239,239,239)');
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   useEffect(() => {
@@ -26,9 +27,11 @@ export function Section({ title, diagrams, children }) {
     );
   }, []);
 
-  if (!title && !children) {
+  if (!title && (!children || children.trim() === '')) {
     return null;
   }
+
+  // console.log('diagrams', diagrams);
 
   return (
     <section
@@ -41,13 +44,24 @@ export function Section({ title, diagrams, children }) {
       <p className={font2.className}>{children}</p>
       {diagrams
         ? diagrams.map((diagram, index) => {
+            if (!diagram || diagram.type != 'img') {
+              return null;
+            }
+
             return (
               <div key={index} className={styles.diagrams}>
-                {diagram.image.map((figure, index) => (
-                  <>
-                    <img key={index} src={figure} alt={diagram.alt} />
-                  </>
-                ))}
+                {diagram?.figures
+                  ? diagram.figures.map((figure, index) => (
+                      <>
+                        <img
+                          key={index}
+                          src={figure}
+                          alt={diagram.alt}
+                          className={styles.image}
+                        />
+                      </>
+                    ))
+                  : null}
                 <p>{diagram.description}</p>
               </div>
             );
