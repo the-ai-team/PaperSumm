@@ -1,5 +1,4 @@
-# OpenAI-Hackathon
-
+# Papersumm
 `client.py` - Streamlit frontend  
 `server.py` - API integrations and server logics 
 
