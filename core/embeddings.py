@@ -1,22 +1,24 @@
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import tiktoken
 
-load_dotenv() # Load the environment variables from the .env file
+load_dotenv()  # Load the environment variables from the .env file
 
-openai_api_key = os.getenv('OPENAI_API_KEY') # Get the value of the API key
-openai.api_key=openai_api_key
+client = OpenAI()
+embedding_model = "text-embedding-3-large"  # The model to use for embeddings
+
+# Load the cl100k_base tokenizer which is designed to work with the ada-002 model
+tokenizer = tiktoken.get_encoding("cl100k_base")
 
 
-tokenizer = tiktoken.get_encoding("cl100k_base") # Load the cl100k_base tokenizer which is designed to work with the davinci-003 model
-
-
-def Embeddings(df,text_column = 'Text'):
+def Embeddings(df, text_column='Text'):
     """
     Main function to get embeddings
     """
-    df['Embeddings'] = df[text_column].apply(lambda x: openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding']) #get embeddings
-    df['N_tokens'] = df[text_column].apply(lambda x: len(tokenizer.encode(x))) # Tokenize the text and save the number of tokens to a new column
+    df['Embeddings'] = df[text_column].apply(lambda x: client.embeddings.create(
+        input=[x], model=embedding_model).data[0].embedding)  # get embeddings
+    # Tokenize the text and save the number of tokens to a new column
+    df['N_tokens'] = df[text_column].apply(lambda x: len(tokenizer.encode(x)))
 
     return df

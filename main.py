@@ -1,3 +1,4 @@
+from core.app import Generate_summary
 import asyncio
 import json
 import uuid
@@ -10,8 +11,6 @@ from sse_starlette.sse import EventSourceResponse
 
 STREAM_DELAY = 20  # milliseconds
 RETRY_TIMEOUT = 15000  # milliseconds
-
-from core.app import Generate_summary
 
 
 class Inputs(BaseModel):

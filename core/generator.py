@@ -2,18 +2,22 @@ import asyncio
 import copy
 import json
 from random import sample
-from core.embeddings import openai
+from core.embeddings import OpenAI
 import concurrent.futures
 import time
+from scipy.spatial import distance
 
-from openai.embeddings_utils import distances_from_embeddings
+client = OpenAI()
+
+generation_model = "gpt-3.5-turbo-0125"
+embedding_model = "text-embedding-3-large"
 
 
 def get_related_info(keyword, context):
     """
     Extract related information from the context
     """
-    response = openai.ChatCompletion.create(  # Create a completions using the keyword and context
+    response = client.chat.completions.create(  # Create a completions using the keyword and context
         messages=[
             {
                 "role": "user",
@@ -29,34 +33,32 @@ def get_related_info(keyword, context):
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
-        model="gpt-3.5-turbo",
+        model=generation_model,
     )
-    return response["choices"][0]["message"]["content"].strip()
+    return response.choices[0].message.content.strip()
 
 
 def generate_content_with_stream(
-    context, keyword, model="gpt-3.5-turbo", stop_sequence=None
+    context, keyword, model=generation_model, stop_sequence=None
 ):
     print("Generating content")
 
     """
     Generate content based on the generated points of the paper
     """
-    responses = openai.ChatCompletion.create(  # Create a completions using the keyword and context
-        # TODO: remove text limit
+    responses = client.chat.completions.create(  # Create a completions using the keyword and context
         messages=[
             {
                 "role": "user",
                 "content": f"""
-                Organize the following points related to {keyword} of a research by dividing into suitable subtopics. 
-                Generate a summarized paragraph for each subtopic.\n\n use this format,\n ## generated subtopic ##\n 
-                <Summarized paragraph under the subtopic>\n\n points: {context} 
+                Organize the following points related to {keyword} of a research by dividing into suitable subtopics.
+                Generate a summarized paragraph for each subtopic.\n\n use this format,\n ## generated subtopic ##\n
+                <Summarized paragraph under the subtopic>\n\n points: {context}
                 organized document:
                  """,
             }
         ],
         temperature=0.5,
-        max_tokens=2048,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
@@ -66,9 +68,9 @@ def generate_content_with_stream(
     )
 
     for response in responses:
-        data = response["choices"][0]["delta"]
+        data = response.choices[0].delta
         if "content" in data:
-            content = data["content"]
+            content = data.content
             yield content
 
 
@@ -170,15 +172,12 @@ def match_diagrams(diagrams_df, generated_content_dict, threshold=0.15):
     match diagrams for each generated section
     """
     for section in generated_content_dict:
-        content_embeddings = openai.Embedding.create(
-            input=section["paragraph"], engine="text-embedding-ada-002"
-        )["data"][0][
-            "embedding"
-        ]  # Get Embeddings
-        diagrams_df["Distances"] = distances_from_embeddings(
+        content_embeddings = client.embeddings.create(
+            input=section["paragraph"], model=embedding_model
+        ).data[0].embedding  # Get Embeddings
+        diagrams_df["Distances"] = distance.cosine(
             content_embeddings,
-            diagrams_df["Embeddings"].values,
-            distance_metric="cosine",
+            diagrams_df["Embeddings"].values
         )  # Get the distances from the embeddings
 
         diagrams_df = diagrams_df.sort_values(
@@ -200,7 +199,8 @@ def Generate(content_df, diagrams_df, keyword):
     """
     Main function for generating
     """
-    information = [None] * len(content_df)  # Initialize the list with None values
+    information = [None] * \
+        len(content_df)  # Initialize the list with None values
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {}
         for i, row in content_df.iterrows():
@@ -210,7 +210,8 @@ def Generate(content_df, diagrams_df, keyword):
                 executor.submit(get_related_info, context, keyword)
             ] = i  # Use a dictionary to associate each future with an index
         for future in concurrent.futures.as_completed(futures):
-            i = futures[future]  # Get the index associated with the completed future
+            # Get the index associated with the completed future
+            i = futures[future]
             information[
                 i
             ] = future.result()  # Add the result to the appropriate index in the list
@@ -218,7 +219,8 @@ def Generate(content_df, diagrams_df, keyword):
     related_information = ("\n").join(information)
     # print(related_information)
 
-    generated_content = generate_content_with_stream(related_information, keyword)
+    generated_content = generate_content_with_stream(
+        related_information, keyword)
     # print(generated_content)
 
     content_metadata = ContentMetadata()
